@@ -102,20 +102,20 @@ export default function ClinicalLayout({ children, title, subtitle, actions }: C
           {navItems.map(({ href, label, icon: Icon }) => {
             const isActive = location === href || (href !== "/dashboard" && location.startsWith(href));
             return (
-              <Link key={href} href={href}>
-                <a
-                  onClick={() => setSidebarOpen(false)}
-                  className={cn(
-                    "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 group",
-                    isActive
-                      ? "bg-white/10 text-white"
-                      : "text-white/60 hover:bg-white/6 hover:text-white/90"
-                  )}
-                >
-                  <Icon className={cn("w-4 h-4 flex-shrink-0", isActive ? "text-white" : "text-white/50 group-hover:text-white/80")} />
-                  <span>{label}</span>
-                  {isActive && <ChevronRight className="w-3 h-3 ml-auto text-white/40" />}
-                </a>
+              <Link
+                key={href}
+                href={href}
+                onClick={() => setSidebarOpen(false)}
+                className={cn(
+                  "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 group",
+                  isActive
+                    ? "bg-white/10 text-white"
+                    : "text-white/60 hover:bg-white/6 hover:text-white/90"
+                )}
+              >
+                <Icon className={cn("w-4 h-4 flex-shrink-0", isActive ? "text-white" : "text-white/50 group-hover:text-white/80")} />
+                <span>{label}</span>
+                {isActive && <ChevronRight className="w-3 h-3 ml-auto text-white/40" />}
               </Link>
             );
           })}

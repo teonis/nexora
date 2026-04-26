@@ -71,7 +71,7 @@
 - [x] Estados de loading/erro em todas as páginas
 - [x] Responsividade mobile-first
 
-## Melhorias Futuras
+## Melhorias Futuras (v2)
 - [ ] Notificações de retorno de pacientes inativos
 - [ ] Exportação de dados em CSV (admin only)
 - [ ] Integração com prontuário eletrônico externo
