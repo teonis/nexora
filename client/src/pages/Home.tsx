@@ -572,6 +572,320 @@ function AnimatedMockup() {
   );
 }
 
+/* ─── Clari Interactive Demo ─── */
+const SOAP_STEPS = [
+  {
+    id: "idle",
+    label: "Ver Clari em ação",
+    description: "Clique para ver a IA estruturando uma nota clínica",
+  },
+];
+
+const SOAP_CONTENT = {
+  S: "Paciente masculino, 52 anos, refere dor torácica em aperto há 3 dias, com piora progressiva ao esforço físico moderado. Nega irradiação. Relata dispneia leve associada. HAS em uso de losartana 50mg/dia.",
+  O: "PA: 148/92 mmHg · FC: 88 bpm · SpO2: 97% · Ausculta cardíaca: RCR 2T, sem sopros. Ausculta pulmonar: MV+ bilateral, sem ruídos adventícios.",
+  A: "Síndrome coronariana aguda a esclarecer. Angina instável como principal hipótese diagnóstica. Diagnósticos diferenciais: DRGE, musculoesquelético.",
+  P: "ECG 12 derivações imediato · Troponina I seriada (0h/3h) · AAS 300mg VO agora · Encaminhamento para avaliação cardiológica urgente · Monitorização contínua",
+};
+
+function ClariDemo() {
+  const [phase, setPhase] = useState<"idle" | "transcribing" | "structuring" | "done">("idle");
+  const [typedS, setTypedS] = useState("");
+  const [typedO, setTypedO] = useState("");
+  const [typedA, setTypedA] = useState("");
+  const [typedP, setTypedP] = useState("");
+  const [showActions, setShowActions] = useState(false);
+  const [clickedAction, setClickedAction] = useState<string | null>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  function typeText(
+    text: string,
+    setter: (v: string) => void,
+    onDone: () => void,
+    speed = 18
+  ) {
+    let i = 0;
+    function tick() {
+      i++;
+      setter(text.slice(0, i));
+      if (i < text.length) {
+        timerRef.current = setTimeout(tick, speed);
+      } else {
+        onDone();
+      }
+    }
+    timerRef.current = setTimeout(tick, speed);
+  }
+
+  function startDemo() {
+    if (phase !== "idle") { resetDemo(); return; }
+    setPhase("transcribing");
+    setTypedS(""); setTypedO(""); setTypedA(""); setTypedP("");
+    setShowActions(false); setClickedAction(null);
+
+    timerRef.current = setTimeout(() => {
+      setPhase("structuring");
+      typeText(SOAP_CONTENT.S, setTypedS, () =>
+        typeText(SOAP_CONTENT.O, setTypedO, () =>
+          typeText(SOAP_CONTENT.A, setTypedA, () =>
+            typeText(SOAP_CONTENT.P, setTypedP, () => {
+              setPhase("done");
+              setTimeout(() => setShowActions(true), 400);
+            }, 14)
+          , 14)
+        , 14)
+      , 14);
+    }, 1800);
+  }
+
+  function resetDemo() {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    setPhase("idle");
+    setTypedS(""); setTypedO(""); setTypedA(""); setTypedP("");
+    setShowActions(false); setClickedAction(null);
+  }
+
+  useEffect(() => () => { if (timerRef.current) clearTimeout(timerRef.current); }, []);
+
+  const soapColor = "#C9A646";
+
+  return (
+    <div style={{
+      background: "#fff",
+      borderRadius: 16,
+      border: "1px solid rgba(17,24,39,0.08)",
+      boxShadow: "0 8px 40px rgba(17,24,39,0.07)",
+      overflow: "hidden",
+      userSelect: "none",
+    }}>
+      {/* Header */}
+      <div style={{
+        padding: "14px 20px",
+        borderBottom: "1px solid rgba(17,24,39,0.06)",
+        display: "flex", alignItems: "center", gap: 10,
+      }}>
+        <div style={{
+          width: 32, height: 32, borderRadius: "50%",
+          background: "rgba(201,166,70,0.10)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+        }}>
+          <Bot size={15} color={soapColor} />
+        </div>
+        <div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: "#111827" }}>Clari</div>
+          <div style={{ fontSize: 11, color: "#9CA3AF" }}>Assistente clínica</div>
+        </div>
+        <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 6 }}>
+          {phase !== "idle" && (
+            <button
+              onClick={resetDemo}
+              style={{
+                fontSize: 10, color: "#9CA3AF", background: "none", border: "none",
+                cursor: "pointer", fontFamily: "inherit", padding: "3px 8px",
+                borderRadius: 6, transition: "color 0.15s",
+              }}
+              onMouseEnter={e => (e.currentTarget.style.color = "#6B7280")}
+              onMouseLeave={e => (e.currentTarget.style.color = "#9CA3AF")}
+            >
+              Reiniciar
+            </button>
+          )}
+          <div style={{ width: 7, height: 7, borderRadius: "50%", background: phase === "idle" ? "#D1D5DB" : "#22C55E", transition: "background 0.4s" }} />
+          <span style={{ fontSize: 11, color: "#9CA3AF" }}>{phase === "idle" ? "Aguardando" : "Online"}</span>
+        </div>
+      </div>
+
+      {/* Body */}
+      <div style={{ padding: "20px", minHeight: 260 }}>
+
+        {/* IDLE STATE — CTA */}
+        {phase === "idle" && (
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: 220, gap: 16, textAlign: "center" }}>
+            <div style={{
+              width: 52, height: 52, borderRadius: "50%",
+              background: "rgba(201,166,70,0.08)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}>
+              <FileText size={22} color={soapColor} />
+            </div>
+            <div>
+              <p style={{ fontSize: 14, fontWeight: 600, color: "#111827", margin: "0 0 6px" }}>Veja a Clari estruturando uma nota</p>
+              <p style={{ fontSize: 12, color: "#9CA3AF", margin: 0 }}>Clique no botão abaixo para iniciar a demonstração</p>
+            </div>
+            <button
+              onClick={startDemo}
+              style={{
+                display: "inline-flex", alignItems: "center", gap: 7,
+                padding: "10px 22px", borderRadius: 10,
+                background: "#111827", color: "#fff",
+                fontSize: 13, fontWeight: 600, border: "none",
+                cursor: "pointer", fontFamily: "inherit",
+                boxShadow: "0 2px 8px rgba(17,24,39,0.15)",
+                transition: "all 0.15s",
+              }}
+              onMouseEnter={e => { e.currentTarget.style.background = "#1f2937"; e.currentTarget.style.transform = "translateY(-1px)"; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "#111827"; e.currentTarget.style.transform = "translateY(0)"; }}
+            >
+              <Mic size={14} /> Iniciar demonstração
+            </button>
+          </div>
+        )}
+
+        {/* TRANSCRIBING STATE */}
+        {phase === "transcribing" && (
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: 220, gap: 14 }}>
+            <div style={{ display: "flex", gap: 5, alignItems: "center" }}>
+              {[0, 1, 2, 3, 4].map(i => (
+                <div key={i} style={{
+                  width: 3, borderRadius: 3,
+                  background: soapColor,
+                  animation: `clari-wave 0.9s ease-in-out ${i * 0.12}s infinite alternate`,
+                  height: 8 + Math.sin(i) * 8,
+                }} />
+              ))}
+            </div>
+            <p style={{ fontSize: 13, color: "#6B7280", margin: 0 }}>Transcrevendo consulta...</p>
+            <p style={{ fontSize: 11, color: "#D1D5DB", margin: 0, fontStyle: "italic" }}>"...paciente refere dor torácica há 3 dias, piora ao esforço..."</p>
+            <style>{`@keyframes clari-wave { from { transform: scaleY(0.5); } to { transform: scaleY(1.8); } }`}</style>
+          </div>
+        )}
+
+        {/* STRUCTURING / DONE STATE — SOAP */}
+        {(phase === "structuring" || phase === "done") && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {/* Clari intro message */}
+            <div style={{ display: "flex", gap: 8, marginBottom: 4 }}>
+              <div style={{
+                width: 26, height: 26, borderRadius: "50%", flexShrink: 0,
+                background: "rgba(201,166,70,0.08)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}>
+                <Bot size={12} color={soapColor} />
+              </div>
+              <div style={{
+                background: "#F9FAFB", borderRadius: "4px 12px 12px 12px",
+                padding: "8px 12px", fontSize: 12, color: "#374151", lineHeight: 1.5,
+              }}>
+                {phase === "structuring" ? "Estruturando nota SOAP..." : "Nota SOAP gerada com sucesso."}
+              </div>
+            </div>
+
+            {/* SOAP Card */}
+            <div style={{
+              background: "#F9FAFB", borderRadius: 12,
+              border: "1px solid rgba(17,24,39,0.06)",
+              padding: "14px 16px",
+              display: "flex", flexDirection: "column", gap: 10,
+            }}>
+              {([
+                { key: "S", label: "Subjetivo", text: typedS },
+                { key: "O", label: "Objetivo", text: typedO },
+                { key: "A", label: "Avaliação", text: typedA },
+                { key: "P", label: "Plano", text: typedP },
+              ] as const).map(({ key, label, text }) => (
+                <div key={key} style={{ display: text ? "block" : "none" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 3 }}>
+                    <span style={{
+                      fontSize: 10, fontWeight: 800, color: soapColor,
+                      background: "rgba(201,166,70,0.10)",
+                      padding: "2px 7px", borderRadius: 4, letterSpacing: "0.06em",
+                    }}>{key}</span>
+                    <span style={{ fontSize: 10, color: "#9CA3AF", fontWeight: 500 }}>{label}</span>
+                  </div>
+                  <p style={{ fontSize: 11.5, color: "#374151", lineHeight: 1.6, margin: 0 }}>
+                    {text}
+                    {phase === "structuring" && (
+                      (key === "S" && typedS.length < SOAP_CONTENT.S.length) ||
+                      (key === "O" && typedS.length === SOAP_CONTENT.S.length && typedO.length < SOAP_CONTENT.O.length) ||
+                      (key === "A" && typedO.length === SOAP_CONTENT.O.length && typedA.length < SOAP_CONTENT.A.length) ||
+                      (key === "P" && typedA.length === SOAP_CONTENT.A.length && typedP.length < SOAP_CONTENT.P.length)
+                    ) && <span style={{ display: "inline-block", width: 2, height: 12, background: soapColor, marginLeft: 2, animation: "clari-blink 0.8s step-end infinite", verticalAlign: "middle" }} />}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            {/* Action buttons — appear after done */}
+            {showActions && (
+              <div style={{
+                display: "flex", gap: 8, flexWrap: "wrap",
+                opacity: showActions ? 1 : 0,
+                transform: showActions ? "translateY(0)" : "translateY(6px)",
+                transition: "opacity 0.4s ease, transform 0.4s ease",
+              }}>
+                {[
+                  { label: "Gerar prescrição", icon: "💊" },
+                  { label: "Pedido de exame", icon: "🔬" },
+                  { label: "Exportar PDF", icon: "📄" },
+                ].map(({ label, icon }) => (
+                  <button
+                    key={label}
+                    onClick={() => setClickedAction(label)}
+                    style={{
+                      display: "inline-flex", alignItems: "center", gap: 5,
+                      fontSize: 11, fontWeight: 600,
+                      padding: "6px 12px", borderRadius: 8,
+                      background: clickedAction === label ? "#111827" : "rgba(201,166,70,0.08)",
+                      color: clickedAction === label ? "#fff" : soapColor,
+                      border: `1px solid ${clickedAction === label ? "#111827" : "rgba(201,166,70,0.20)"}`,
+                      cursor: "pointer", fontFamily: "inherit",
+                      transition: "all 0.15s",
+                    }}
+                    onMouseEnter={e => { if (clickedAction !== label) { e.currentTarget.style.background = "rgba(201,166,70,0.15)"; } }}
+                    onMouseLeave={e => { if (clickedAction !== label) { e.currentTarget.style.background = "rgba(201,166,70,0.08)"; } }}
+                  >
+                    <span>{icon}</span> {label}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Clicked action feedback */}
+            {clickedAction && (
+              <div style={{
+                display: "flex", gap: 8, alignItems: "flex-start",
+                animation: "clari-fadein 0.35s ease",
+              }}>
+                <div style={{
+                  width: 26, height: 26, borderRadius: "50%", flexShrink: 0,
+                  background: "rgba(201,166,70,0.08)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                }}>
+                  <Bot size={12} color={soapColor} />
+                </div>
+                <div style={{
+                  background: "#F9FAFB", borderRadius: "4px 12px 12px 12px",
+                  padding: "8px 12px", fontSize: 12, color: "#374151", lineHeight: 1.5,
+                }}>
+                  {clickedAction === "Gerar prescrição" && "Prescri\u00e7\u00e3o gerada: Losartana 50mg 1x/dia, AAS 100mg 1x/dia. Deseja ajustar a dosagem?"}
+                  {clickedAction === "Pedido de exame" && "Pedido gerado: ECG 12 deriv., Troponina I seriada, Hemograma, Glicemia, Perfil lip\u00eddico. Deseja adicionar outro exame?"}
+                  {clickedAction === "Exportar PDF" && "PDF gerado com sucesso. O documento inclui a nota SOAP completa e assinatura digital."}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Disclaimer */}
+      <div style={{
+        padding: "10px 20px 14px",
+        borderTop: "1px solid rgba(17,24,39,0.05)",
+        textAlign: "center",
+      }}>
+        <p style={{ fontSize: 10, color: "#D1D5DB", margin: 0 }}>
+          Clari é suporte clínico. A decisão médica é sempre do profissional.
+        </p>
+      </div>
+
+      <style>{`
+        @keyframes clari-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        @keyframes clari-fadein { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+      `}</style>
+    </div>
+  );
+}
+
 export default function Home() {
   const { isAuthenticated } = useAuth();
   const [, navigate] = useLocation();
@@ -807,110 +1121,9 @@ export default function Home() {
             </a>
           </FadeIn>
 
-          {/* Chat UI */}
+          {/* Interactive Clari Demo */}
           <FadeIn delay={80}>
-            <div style={{
-              background: "#fff",
-              borderRadius: 16,
-              border: "1px solid rgba(17,24,39,0.08)",
-              boxShadow: "0 8px 40px rgba(17,24,39,0.07)",
-              overflow: "hidden",
-            }}>
-              {/* Header */}
-              <div style={{
-                padding: "16px 20px",
-                borderBottom: "1px solid rgba(17,24,39,0.06)",
-                display: "flex", alignItems: "center", gap: 10,
-              }}>
-                <div style={{
-                  width: 32, height: 32, borderRadius: "50%",
-                  background: "rgba(201,166,70,0.10)",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                }}>
-                  <Bot size={15} color="#C9A646" />
-                </div>
-                <div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: "#111827" }}>Clari</div>
-                  <div style={{ fontSize: 11, color: "#9CA3AF" }}>Assistente clínica</div>
-                </div>
-                <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 5 }}>
-                  <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#22C55E" }} />
-                  <span style={{ fontSize: 11, color: "#9CA3AF" }}>Online</span>
-                </div>
-              </div>
-
-              {/* Messages */}
-              <div style={{ padding: "20px", display: "flex", flexDirection: "column", gap: 14 }}>
-                {/* Clari message */}
-                <div style={{ display: "flex", gap: 10 }}>
-                  <div style={{
-                    width: 28, height: 28, borderRadius: "50%", flexShrink: 0,
-                    background: "rgba(201,166,70,0.08)",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                  }}>
-                    <Bot size={13} color="#C9A646" />
-                  </div>
-                  <div style={{
-                    background: "#F9FAFB", borderRadius: "4px 14px 14px 14px",
-                    padding: "10px 14px", fontSize: 13, color: "#374151", lineHeight: 1.55,
-                    maxWidth: "85%",
-                  }}>
-                    Identifiquei padrões compatíveis com esta hipótese. Deseja explorar as condutas possíveis?
-                  </div>
-                </div>
-
-                {/* User message */}
-                <div style={{ display: "flex", justifyContent: "flex-end" }}>
-                  <div style={{
-                    background: "#111827", borderRadius: "14px 4px 14px 14px",
-                    padding: "10px 14px", fontSize: 13, color: "#fff", lineHeight: 1.55,
-                    maxWidth: "80%",
-                  }}>
-                    Sim, quais são as opções de primeira linha?
-                  </div>
-                </div>
-
-                {/* Clari response */}
-                <div style={{ display: "flex", gap: 10 }}>
-                  <div style={{
-                    width: 28, height: 28, borderRadius: "50%", flexShrink: 0,
-                    background: "rgba(201,166,70,0.08)",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                  }}>
-                    <Bot size={13} color="#C9A646" />
-                  </div>
-                  <div style={{
-                    background: "#F9FAFB", borderRadius: "4px 14px 14px 14px",
-                    padding: "10px 14px", fontSize: 13, color: "#374151", lineHeight: 1.55,
-                    maxWidth: "85%",
-                  }}>
-                    Com base nas diretrizes atuais, as opções de primeira linha incluem...
-                    <div style={{ display: "flex", gap: 6, marginTop: 10 }}>
-                      {["Ver evidências", "Gerar prescrição"].map(label => (
-                        <span key={label} style={{
-                          fontSize: 11, fontWeight: 600,
-                          padding: "4px 10px", borderRadius: 20,
-                          background: label === "Ver evidências" ? "rgba(201,166,70,0.10)" : "#F3F4F6",
-                          color: label === "Ver evidências" ? "#C9A646" : "#6B7280",
-                          cursor: "pointer",
-                        }}>{label}</span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Disclaimer */}
-              <div style={{
-                padding: "10px 20px 14px",
-                borderTop: "1px solid rgba(17,24,39,0.05)",
-                textAlign: "center",
-              }}>
-                <p style={{ fontSize: 10, color: "#D1D5DB", margin: 0 }}>
-                  Clari é suporte clínico. A decisão médica é sempre do profissional.
-                </p>
-              </div>
-            </div>
+            <ClariDemo />
           </FadeIn>
         </div>
       </section>
