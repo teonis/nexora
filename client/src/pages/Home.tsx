@@ -18,7 +18,7 @@ const features = [
   },
   {
     icon: Bot,
-    title: "Vita AI",
+    title: "Clari",
     description: "Assistente clínico inteligente com suporte baseado em evidências, alertas de interações e sugestões de conduta.",
   },
   {
@@ -66,8 +66,8 @@ export default function Home() {
               <Activity className="w-4 h-4 text-white" />
             </div>
             <div>
-              <span className="text-sm font-semibold text-foreground">Clinical AI</span>
-              <span className="ml-1.5 text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Assistente Clínico</span>
+              <span className="text-sm font-semibold text-foreground">NEXORA</span>
+              <span className="ml-1.5 text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Plataforma Clínica</span>
             </div>
           </div>
           <Button size="sm" onClick={() => window.location.href = getLoginUrl()}>
@@ -87,7 +87,7 @@ export default function Home() {
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/8 border border-primary/15 text-primary text-xs font-medium mb-6">
               <Bot className="w-3.5 h-3.5" />
-              Plataforma de IA Clínica — Vita AI
+              Plataforma de IA Clínica — Clari
             </div>
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold text-foreground leading-tight tracking-tight mb-6">
@@ -97,7 +97,7 @@ export default function Home() {
             </h1>
 
             <p className="text-lg text-muted-foreground leading-relaxed mb-8 max-w-2xl">
-              Automatize a documentação das suas consultas com IA. Transcrição em tempo real, notas SOAP automáticas, assistente clínico baseado em evidências e geração de documentos — tudo em conformidade com a LGPD e as diretrizes do CFM.
+              Automatize a documentação das suas consultas com IA. Transcrição em tempo real, notas SOAP automáticas, Clari baseado em evidências e geração de documentos — tudo em conformidade com a LGPD e as diretrizes do CFM.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3">
@@ -115,7 +115,7 @@ export default function Home() {
             <div className="mt-8 flex items-start gap-2 p-3 rounded-lg bg-amber-50 border border-amber-200 max-w-lg">
               <Shield className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
               <p className="text-xs text-amber-800 leading-relaxed">
-                <strong>Aviso importante:</strong> O Vita AI é uma ferramenta de suporte clínico. A responsabilidade pelo diagnóstico e conduta médica é sempre do profissional. Conformidade com LGPD e CFM.
+                <strong>Aviso importante:</strong> O Clari é uma ferramenta de suporte clínico. A responsabilidade pelo diagnóstico e conduta médica é sempre do profissional. Conformidade com LGPD e CFM.
               </p>
             </div>
           </div>
@@ -160,7 +160,7 @@ export default function Home() {
               Pronto para transformar sua prática clínica?
             </h2>
             <p className="text-muted-foreground mb-6">
-              Acesse a plataforma e experimente o Vita AI na sua próxima consulta.
+              Acesse a plataforma e experimente o Clari na sua próxima consulta.
             </p>
             <Button
               size="lg"
@@ -180,10 +180,10 @@ export default function Home() {
             <div className="w-5 h-5 rounded bg-primary flex items-center justify-center">
               <Activity className="w-3 h-3 text-white" />
             </div>
-            <span className="text-xs text-muted-foreground">Clinical AI — Assistente Clínico com IA</span>
+            <span className="text-xs text-muted-foreground">NEXORA — Plataforma Clínica com IA</span>
           </div>
           <p className="text-xs text-muted-foreground text-center">
-            ⚠️ Vita AI é suporte clínico. Decisão médica é responsabilidade do profissional. Conformidade LGPD.
+            ⚠️ Clari é suporte clínico. Decisão médica é responsabilidade do profissional. Conformidade LGPD.
           </p>
         </div>
       </footer>

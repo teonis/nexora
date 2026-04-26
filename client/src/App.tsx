@@ -11,7 +11,7 @@ import PatientDetail from "./pages/PatientDetail";
 import NewPatient from "./pages/NewPatient";
 import Consultation from "./pages/Consultation";
 import ConsultationDetail from "./pages/ConsultationDetail";
-import VitaAI from "./pages/VitaAI";
+import Clari from "./pages/Clari";
 import Documents from "./pages/Documents";
 
 function Router() {
@@ -24,7 +24,7 @@ function Router() {
       <Route path="/patients/:id" component={PatientDetail} />
       <Route path="/consultation/new" component={Consultation} />
       <Route path="/consultation/:id" component={ConsultationDetail} />
-      <Route path="/vita" component={VitaAI} />
+      <Route path="/clari" component={Clari} />
       <Route path="/documents" component={Documents} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />

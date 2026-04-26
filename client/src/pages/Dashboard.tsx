@@ -111,14 +111,14 @@ export default function Dashboard() {
             </button>
 
             <button
-              onClick={() => navigate("/vita")}
+              onClick={() => navigate("/clari")}
               className="flex items-center gap-3 p-4 rounded-xl border border-border bg-card hover:border-primary/40 hover:bg-primary/3 transition-all duration-150 text-left group"
             >
               <div className="w-9 h-9 rounded-lg bg-violet-50 flex items-center justify-center group-hover:bg-violet-100 transition-colors">
                 <Bot className="w-4.5 h-4.5 text-violet-600" />
               </div>
               <div>
-                <p className="text-sm font-medium text-foreground">Vita AI</p>
+                <p className="text-sm font-medium text-foreground">Clari</p>
                 <p className="text-xs text-muted-foreground">Assistente clínico</p>
               </div>
               <ArrowRight className="w-3.5 h-3.5 text-muted-foreground ml-auto group-hover:text-violet-600 transition-colors" />
@@ -200,9 +200,9 @@ export default function Dashboard() {
         <div className="flex items-start gap-3 p-4 rounded-xl bg-amber-50 border border-amber-200">
           <Bot className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
           <div>
-            <p className="text-xs font-semibold text-amber-800">Aviso sobre o Vita AI</p>
+            <p className="text-xs font-semibold text-amber-800">Aviso sobre o Clari</p>
             <p className="text-xs text-amber-700 mt-0.5 leading-relaxed">
-              O Vita AI é uma ferramenta de suporte à decisão clínica baseada em evidências. Todas as sugestões, diagnósticos e condutas geradas pela IA devem ser avaliadas e validadas pelo médico responsável. A responsabilidade clínica final é sempre do profissional de saúde, em conformidade com as diretrizes do CFM e a LGPD.
+              O Clari é uma ferramenta de suporte à decisão clínica baseada em evidências. Todas as sugestões, diagnósticos e condutas geradas pela IA devem ser avaliadas e validadas pelo médico responsável. A responsabilidade clínica final é sempre do profissional de saúde, em conformidade com as diretrizes do CFM e a LGPD.
             </p>
           </div>
         </div>

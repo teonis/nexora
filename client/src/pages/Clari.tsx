@@ -4,13 +4,13 @@ import { trpc } from "@/lib/trpc";
 import { Bot, ChevronRight, Clock, Loader2, Stethoscope } from "lucide-react";
 import { useLocation } from "wouter";
 
-export default function VitaAI() {
+export default function Clari() {
   const [, navigate] = useLocation();
   const { data: consultations, isLoading } = trpc.consultations.list.useQuery({ limit: 10 });
 
   return (
     <ClinicalLayout
-      title="Vita AI"
+      title="Clari"
       subtitle="Assistente clínico baseado em evidências"
     >
       <div className="max-w-3xl space-y-5">
@@ -21,13 +21,13 @@ export default function VitaAI() {
               <Bot className="w-6 h-6 text-violet-600" />
             </div>
             <div>
-              <h2 className="text-base font-semibold text-foreground">Vita AI</h2>
+              <h2 className="text-base font-semibold text-foreground">Clari</h2>
               <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
-                O Vita AI é seu assistente clínico contextual. Para aproveitar ao máximo, acesse-o diretamente durante uma consulta — ele terá acesso ao contexto do paciente, transcrição e nota SOAP para fornecer suporte mais preciso.
+                O Clari é seu NEXORA contextual. Para aproveitar ao máximo, acesse-o diretamente durante uma consulta — ele terá acesso ao contexto do paciente, transcrição e nota SOAP para fornecer suporte mais preciso.
               </p>
               <div className="mt-3 p-2.5 rounded-lg bg-amber-50 border border-amber-200">
                 <p className="text-xs text-amber-800">
-                  ⚠️ O Vita AI fornece sugestões baseadas em evidências científicas. A decisão clínica final é sempre responsabilidade do médico, em conformidade com as diretrizes do CFM.
+                  ⚠️ O Clari fornece sugestões baseadas em evidências científicas. A decisão clínica final é sempre responsabilidade do médico, em conformidade com as diretrizes do CFM.
                 </p>
               </div>
             </div>
@@ -46,7 +46,7 @@ export default function VitaAI() {
               <div className="p-8 text-center">
                 <Stethoscope className="w-8 h-8 text-muted-foreground/30 mx-auto mb-2" />
                 <p className="text-sm text-muted-foreground">Nenhuma consulta em andamento</p>
-                <p className="text-xs text-muted-foreground/70 mt-1">Inicie uma consulta para usar o Vita AI com contexto do paciente</p>
+                <p className="text-xs text-muted-foreground/70 mt-1">Inicie uma consulta para usar o Clari com contexto do paciente</p>
                 <Button size="sm" className="mt-3" onClick={() => navigate("/consultation/new")}>
                   Nova Consulta
                 </Button>

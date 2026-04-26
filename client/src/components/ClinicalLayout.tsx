@@ -24,7 +24,7 @@ const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: Home },
   { href: "/patients", label: "Pacientes", icon: Users },
   { href: "/consultation/new", label: "Nova Consulta", icon: Stethoscope },
-  { href: "/vita", label: "Vita AI", icon: Bot },
+  { href: "/clari", label: "Clari", icon: Bot },
   { href: "/documents", label: "Documentos", icon: FileText },
 ];
 
@@ -85,8 +85,8 @@ export default function ClinicalLayout({ children, title, subtitle, actions }: C
               <Activity className="w-4.5 h-4.5 text-white" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-white leading-none">Clinical AI</p>
-              <p className="text-[10px] text-white/50 mt-0.5">Assistente Clínico</p>
+              <p className="text-sm font-semibold text-white leading-none">NEXORA</p>
+              <p className="text-[10px] text-white/50 mt-0.5">Plataforma Clínica com IA</p>
             </div>
           </div>
           <button
@@ -126,7 +126,7 @@ export default function ClinicalLayout({ children, title, subtitle, actions }: C
           <div className="flex items-start gap-2">
             <Zap className="w-3.5 h-3.5 text-amber-400 mt-0.5 flex-shrink-0" />
             <p className="text-[10px] text-amber-300/80 leading-relaxed">
-              Vita AI é um suporte clínico. A decisão médica final é sempre do profissional.
+              Clari é um suporte clínico. A decisão médica final é sempre do profissional.
             </p>
           </div>
         </div>
