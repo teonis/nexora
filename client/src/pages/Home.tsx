@@ -355,13 +355,7 @@ function AnimatedMockup() {
   const stepContents = [recordingContent, transcribingContent, soapContent, clariContent];
 
   return (
-    <div style={{ marginTop: 56, position: "relative" }}>
-      {/* Glow */}
-      <div style={{
-        position: "absolute", inset: "-40px",
-        background: "radial-gradient(ellipse 70% 50% at 50% 60%, rgba(201,166,70,0.09) 0%, transparent 70%)",
-        pointerEvents: "none",
-      }} />
+    <div style={{ marginTop: 64, position: "relative" }}>
 
       {/* Responsive CSS */}
       <style>{`
@@ -371,9 +365,9 @@ function AnimatedMockup() {
         }
         .mockup-shell {
           background: #fff;
-          border-radius: 16px;
-          border: 1px solid rgba(17,24,39,0.08);
-          box-shadow: 0 8px 40px rgba(17,24,39,0.08), 0 1px 3px rgba(17,24,39,0.06);
+          border-radius: 14px;
+          border: 1px solid rgba(17,24,39,0.06);
+          box-shadow: 0 4px 32px rgba(17,24,39,0.06);
           overflow: hidden;
           max-width: 780px;
           margin: 0 auto;
@@ -385,7 +379,7 @@ function AnimatedMockup() {
           display: flex;
           gap: 0;
           overflow-x: auto;
-          background: #FAFAFA;
+          background: #FEFEFE;
           -webkit-overflow-scrolling: touch;
           scrollbar-width: none;
         }
@@ -652,9 +646,9 @@ function ClariDemo() {
   return (
     <div style={{
       background: "#fff",
-      borderRadius: 16,
-      border: "1px solid rgba(17,24,39,0.08)",
-      boxShadow: "0 8px 40px rgba(17,24,39,0.07)",
+      borderRadius: 14,
+      border: "1px solid rgba(17,24,39,0.06)",
+      boxShadow: "0 4px 24px rgba(17,24,39,0.05)",
       overflow: "hidden",
       userSelect: "none",
     }}>
@@ -896,65 +890,64 @@ export default function Home() {
   }
 
   return (
-    <div style={{ background: "#F9FAFB", color: "#111827", fontFamily: "Inter, system-ui, sans-serif" }}>
+    <div style={{ background: "#fff", color: "#111827", fontFamily: "Inter, system-ui, sans-serif" }}>
       {/* Global responsive styles for landing page */}
       <style>{`
-        .lp-hero { padding: 120px 24px 80px; }
-        .lp-section-lg { padding: 120px 24px; }
-        .lp-section-cta { padding: 120px 24px 140px; }
-        .lp-clari-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+        .lp-hero { padding: 140px 24px 100px; }
+        .lp-section-lg { padding: 140px 24px; }
+        .lp-section-cta { padding: 140px 24px 160px; }
+        .lp-clari-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 96px; align-items: start; }
         .lp-nav-links { display: flex; align-items: center; gap: 32px; }
         .lp-nav-clari { display: block; }
         @media (max-width: 768px) {
-          .lp-hero { padding: 72px 20px 56px; }
-          .lp-section-lg { padding: 72px 20px; }
-          .lp-section-cta { padding: 72px 20px 100px; }
-          .lp-clari-grid { grid-template-columns: 1fr; gap: 40px; }
+          .lp-hero { padding: 88px 20px 72px; }
+          .lp-section-lg { padding: 88px 20px; }
+          .lp-section-cta { padding: 88px 20px 120px; }
+          .lp-clari-grid { grid-template-columns: 1fr; gap: 48px; }
           .lp-nav-clari { display: none; }
           .lp-nav-links { gap: 16px; }
         }
         @media (max-width: 480px) {
-          .lp-hero { padding: 56px 16px 40px; }
-          .lp-section-lg { padding: 56px 16px; }
-          .lp-section-cta { padding: 56px 16px 80px; }
+          .lp-hero { padding: 72px 16px 56px; }
+          .lp-section-lg { padding: 72px 16px; }
+          .lp-section-cta { padding: 72px 16px 100px; }
         }
       `}</style>
 
       {/* ─── NAVBAR ─── */}
       <header style={{
         position: "sticky", top: 0, zIndex: 50,
-        background: "rgba(249,250,251,0.85)",
-        backdropFilter: "blur(12px)",
-        borderBottom: "1px solid rgba(17,24,39,0.06)",
+        background: "rgba(255,255,255,0.90)",
+        backdropFilter: "blur(16px)",
+        borderBottom: "1px solid rgba(17,24,39,0.05)",
       }}>
         <div style={{ maxWidth: 1080, margin: "0 auto", padding: "0 20px", height: 60, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           {/* Logo */}
-          <span style={{ fontSize: 15, fontWeight: 800, letterSpacing: "0.12em", color: "#111827" }}>NEXORA</span>
+          <span style={{ fontSize: 14, fontWeight: 700, letterSpacing: "0.14em", color: "#111827" }}>NEXORA</span>
 
           {/* Nav */}
           <nav className="lp-nav-links">
             <button
               onClick={() => document.getElementById("clari")?.scrollIntoView({ behavior: "smooth" })}
               className="lp-nav-clari"
-              style={{ fontSize: 14, color: "#6B7280", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}
-              onMouseEnter={e => (e.currentTarget.style.color = "#111827")}
-              onMouseLeave={e => (e.currentTarget.style.color = "#6B7280")}
+              style={{ fontSize: 13, color: "#9CA3AF", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", fontWeight: 400 }}
+              onMouseEnter={e => (e.currentTarget.style.color = "#374151")}
+              onMouseLeave={e => (e.currentTarget.style.color = "#9CA3AF")}
             >
               Clari
             </button>
             <a
               href={getLoginUrl()}
               style={{
-                fontSize: 14, fontWeight: 600, color: "#111827",
-                background: "#fff", border: "1px solid rgba(17,24,39,0.12)",
-                padding: "7px 18px", borderRadius: 8, textDecoration: "none",
-                boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
-                transition: "box-shadow 0.15s",
+                fontSize: 13, fontWeight: 500, color: "#374151",
+                background: "transparent", border: "none",
+                padding: "7px 0", textDecoration: "none",
+                transition: "color 0.15s",
               }}
-              onMouseEnter={e => (e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.10)")}
-              onMouseLeave={e => (e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.06)")}
+              onMouseEnter={e => (e.currentTarget.style.color = "#111827")}
+              onMouseLeave={e => (e.currentTarget.style.color = "#374151")}
             >
-              Entrar
+              Entrar →
             </a>
           </nav>
         </div>
@@ -964,12 +957,10 @@ export default function Home() {
       <section className="lp-hero" style={{ maxWidth: 1080, margin: "0 auto", textAlign: "center" }}>
         <FadeIn>
           {/* Label */}
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 6, marginBottom: 28 }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 6, marginBottom: 32 }}>
             <span style={{
-              fontSize: 12, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase",
-              color: "#C9A646", background: "rgba(201,166,70,0.08)",
-              padding: "5px 12px", borderRadius: 20,
-              border: "1px solid rgba(201,166,70,0.18)",
+              fontSize: 11, fontWeight: 500, letterSpacing: "0.10em", textTransform: "uppercase",
+              color: "#9CA3AF",
             }}>
               Inteligência clínica em tempo real
             </span>
@@ -977,13 +968,13 @@ export default function Home() {
 
           {/* Headline */}
           <h1 style={{
-            fontSize: "clamp(2.4rem, 5.5vw, 4rem)",
-            fontWeight: 800,
-            lineHeight: 1.08,
+            fontSize: "clamp(2.6rem, 5.5vw, 4.2rem)",
+            fontWeight: 700,
+            lineHeight: 1.1,
             letterSpacing: "-0.03em",
             color: "#111827",
-            margin: "0 auto 20px",
-            maxWidth: 680,
+            margin: "0 auto 24px",
+            maxWidth: 640,
           }}>
             Menos burocracia.<br />
             <span style={{ color: "#C9A646" }}>Mais medicina.</span>
@@ -991,46 +982,44 @@ export default function Home() {
 
           {/* Subheadline */}
           <p style={{
-            fontSize: "clamp(1rem, 2vw, 1.2rem)",
-            color: "#6B7280",
-            lineHeight: 1.6,
-            maxWidth: 480,
-            margin: "0 auto 40px",
+            fontSize: "clamp(1rem, 2vw, 1.15rem)",
+            color: "#9CA3AF",
+            lineHeight: 1.7,
+            maxWidth: 440,
+            margin: "0 auto 48px",
             fontWeight: 400,
           }}>
             A NEXORA organiza sua consulta enquanto ela acontece e apoia sua decisão clínica.
           </p>
 
           {/* CTAs */}
-          <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+          <div style={{ display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap", alignItems: "center" }}>
             <a
               href={getLoginUrl()}
               style={{
                 display: "inline-flex", alignItems: "center", gap: 8,
-                padding: "13px 28px", borderRadius: 10,
+                padding: "12px 28px", borderRadius: 8,
                 background: "#111827", color: "#fff",
-                fontSize: 15, fontWeight: 600, textDecoration: "none",
-                boxShadow: "0 2px 8px rgba(17,24,39,0.18)",
-                transition: "all 0.15s",
+                fontSize: 14, fontWeight: 500, textDecoration: "none",
+                transition: "opacity 0.15s",
               }}
-              onMouseEnter={e => { e.currentTarget.style.background = "#1f2937"; e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 6px 20px rgba(17,24,39,0.22)"; }}
-              onMouseLeave={e => { e.currentTarget.style.background = "#111827"; e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 2px 8px rgba(17,24,39,0.18)"; }}
+              onMouseEnter={e => { e.currentTarget.style.opacity = "0.85"; }}
+              onMouseLeave={e => { e.currentTarget.style.opacity = "1"; }}
             >
               Começar agora
-              <ArrowRight size={16} />
             </a>
             <button
               onClick={() => document.getElementById("valor")?.scrollIntoView({ behavior: "smooth" })}
               style={{
                 display: "inline-flex", alignItems: "center", gap: 6,
-                padding: "13px 24px", borderRadius: 10,
-                background: "transparent", color: "#6B7280",
-                fontSize: 15, fontWeight: 500, border: "1px solid rgba(17,24,39,0.10)",
+                padding: "12px 0", borderRadius: 0,
+                background: "transparent", color: "#9CA3AF",
+                fontSize: 14, fontWeight: 400, border: "none",
                 cursor: "pointer", fontFamily: "inherit",
-                transition: "all 0.15s",
+                transition: "color 0.15s",
               }}
-              onMouseEnter={e => { e.currentTarget.style.color = "#111827"; e.currentTarget.style.borderColor = "rgba(17,24,39,0.20)"; }}
-              onMouseLeave={e => { e.currentTarget.style.color = "#6B7280"; e.currentTarget.style.borderColor = "rgba(17,24,39,0.10)"; }}
+              onMouseEnter={e => { e.currentTarget.style.color = "#374151"; }}
+              onMouseLeave={e => { e.currentTarget.style.color = "#9CA3AF"; }}
             >
               Ver como funciona
             </button>
@@ -1043,20 +1032,12 @@ export default function Home() {
         </FadeIn>
       </section>
 
-      {/* ─── DIVIDER ─── */}
-      <div style={{ maxWidth: 1080, margin: "0 auto", padding: "0 24px" }}>
-        <div style={{ height: 1, background: "rgba(17,24,39,0.06)" }} />
-      </div>
-
       {/* ─── VALUE ─── */}
       <section id="valor" className="lp-section-lg" style={{ maxWidth: 680, margin: "0 auto", textAlign: "center" }}>
         <FadeIn>
-          <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "#C9A646", marginBottom: 24 }}>
-            Por que a NEXORA
-          </p>
           <h2 style={{
-            fontSize: "clamp(1.8rem, 4vw, 2.8rem)",
-            fontWeight: 800, lineHeight: 1.15,
+            fontSize: "clamp(1.9rem, 4vw, 3rem)",
+            fontWeight: 700, lineHeight: 1.15,
             letterSpacing: "-0.025em",
             color: "#111827",
             margin: "0 auto 28px",
@@ -1064,45 +1045,40 @@ export default function Home() {
             Você não precisa documentar depois.<br />
             <span style={{ color: "#C9A646" }}>A consulta já sai pronta.</span>
           </h2>
-          <p style={{ fontSize: 17, color: "#6B7280", lineHeight: 1.7, maxWidth: 480, margin: "0 auto" }}>
-            Enquanto você atende, a NEXORA transcreve, estrutura e organiza tudo em formato clínico — sem interromper seu raciocínio.
+          <p style={{ fontSize: 17, color: "#9CA3AF", lineHeight: 1.75, maxWidth: 440, margin: "0 auto" }}>
+            Enquanto você atende, a NEXORA transcreve, estrutura e organiza — sem interromper seu raciocínio.
           </p>
         </FadeIn>
       </section>
-
-      {/* ─── DIVIDER ─── */}
-      <div style={{ maxWidth: 1080, margin: "0 auto", padding: "0 24px" }}>
-        <div style={{ height: 1, background: "rgba(17,24,39,0.06)" }} />
-      </div>
 
       {/* ─── CLARI ─── */}
       <section id="clari" className="lp-section-lg" style={{ maxWidth: 1080, margin: "0 auto" }}>
         <div className="lp-clari-grid">
           {/* Text */}
           <FadeIn>
-            <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "#C9A646", marginBottom: 20 }}>
+            <p style={{ fontSize: 11, fontWeight: 500, letterSpacing: "0.10em", textTransform: "uppercase", color: "#C9A646", marginBottom: 24 }}>
               Clari
             </p>
             <h2 style={{
-              fontSize: "clamp(1.6rem, 3vw, 2.4rem)",
-              fontWeight: 800, lineHeight: 1.15,
-              letterSpacing: "-0.025em",
+              fontSize: "clamp(1.5rem, 3vw, 2.2rem)",
+              fontWeight: 700, lineHeight: 1.2,
+              letterSpacing: "-0.02em",
               color: "#111827",
               marginBottom: 20,
             }}>
               Uma assistente que acompanha sua consulta
             </h2>
-            <p style={{ fontSize: 16, color: "#6B7280", lineHeight: 1.7, marginBottom: 32 }}>
+            <p style={{ fontSize: 15, color: "#9CA3AF", lineHeight: 1.75, marginBottom: 40 }}>
               A Clari organiza, estrutura e sugere — sem interromper.
             </p>
-            <ul style={{ listStyle: "none", padding: 0, margin: "0 0 36px", display: "flex", flexDirection: "column", gap: 12 }}>
+            <ul style={{ listStyle: "none", padding: 0, margin: "0 0 40px", display: "flex", flexDirection: "column", gap: 16 }}>
               {[
                 "Transcrição em tempo real durante a consulta",
                 "Estrutura SOAP gerada automaticamente",
                 "Sugestões baseadas em evidências clínicas",
               ].map(item => (
-                <li key={item} style={{ display: "flex", alignItems: "flex-start", gap: 10, fontSize: 15, color: "#374151" }}>
-                  <CheckCircle2 size={17} color="#C9A646" style={{ marginTop: 2, flexShrink: 0 }} />
+                <li key={item} style={{ display: "flex", alignItems: "flex-start", gap: 12, fontSize: 14, color: "#6B7280" }}>
+                  <span style={{ width: 4, height: 4, borderRadius: "50%", background: "#C9A646", marginTop: 8, flexShrink: 0 }} />
                   {item}
                 </li>
               ))}
@@ -1110,14 +1086,14 @@ export default function Home() {
             <a
               href={getLoginUrl()}
               style={{
-                display: "inline-flex", alignItems: "center", gap: 7,
-                fontSize: 14, fontWeight: 600, color: "#111827",
+                display: "inline-flex", alignItems: "center", gap: 6,
+                fontSize: 13, fontWeight: 500, color: "#9CA3AF",
                 textDecoration: "none",
               }}
-              onMouseEnter={e => (e.currentTarget.style.color = "#C9A646")}
-              onMouseLeave={e => (e.currentTarget.style.color = "#111827")}
+              onMouseEnter={e => (e.currentTarget.style.color = "#374151")}
+              onMouseLeave={e => (e.currentTarget.style.color = "#9CA3AF")}
             >
-              Conhecer a Clari <ArrowRight size={15} />
+              Começar com a Clari →
             </a>
           </FadeIn>
 
@@ -1128,60 +1104,53 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ─── DIVIDER ─── */}
-      <div style={{ maxWidth: 1080, margin: "0 auto", padding: "0 24px" }}>
-        <div style={{ height: 1, background: "rgba(17,24,39,0.06)" }} />
-      </div>
-
       {/* ─── FINAL CTA ─── */}
       <section className="lp-section-cta" style={{ maxWidth: 680, margin: "0 auto", textAlign: "center" }}>
         <FadeIn>
           <h2 style={{
             fontSize: "clamp(1.8rem, 4vw, 2.8rem)",
-            fontWeight: 800, lineHeight: 1.12,
+            fontWeight: 700, lineHeight: 1.15,
             letterSpacing: "-0.025em",
             color: "#111827",
             marginBottom: 20,
           }}>
             Pronto para atender com mais clareza?
           </h2>
-          <p style={{ fontSize: 17, color: "#6B7280", lineHeight: 1.65, marginBottom: 40, maxWidth: 420, margin: "0 auto 40px" }}>
-            Comece agora e veja sua consulta se transformar em documentação clínica completa — automaticamente.
+          <p style={{ fontSize: 16, color: "#9CA3AF", lineHeight: 1.75, maxWidth: 380, margin: "0 auto 48px" }}>
+            Comece agora e veja sua consulta se transformar em documentação completa — automaticamente.
           </p>
           <a
             href={getLoginUrl()}
             style={{
               display: "inline-flex", alignItems: "center", gap: 8,
-              padding: "14px 32px", borderRadius: 10,
+              padding: "12px 28px", borderRadius: 8,
               background: "#111827", color: "#fff",
-              fontSize: 15, fontWeight: 600, textDecoration: "none",
-              boxShadow: "0 2px 8px rgba(17,24,39,0.18)",
-              transition: "all 0.15s",
+              fontSize: 14, fontWeight: 500, textDecoration: "none",
+              transition: "opacity 0.15s",
             }}
-            onMouseEnter={e => { e.currentTarget.style.background = "#1f2937"; e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 6px 20px rgba(17,24,39,0.22)"; }}
-            onMouseLeave={e => { e.currentTarget.style.background = "#111827"; e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 2px 8px rgba(17,24,39,0.18)"; }}
+            onMouseEnter={e => { e.currentTarget.style.opacity = "0.85"; }}
+            onMouseLeave={e => { e.currentTarget.style.opacity = "1"; }}
           >
             Começar agora
-            <ArrowRight size={16} />
           </a>
         </FadeIn>
       </section>
 
       {/* ─── FOOTER ─── */}
       <footer style={{
-        borderTop: "1px solid rgba(17,24,39,0.06)",
-        background: "#F9FAFB",
+        borderTop: "1px solid rgba(17,24,39,0.04)",
+        background: "#fff",
       }}>
         <div style={{
-          maxWidth: 1080, margin: "0 auto", padding: "28px 24px",
+          maxWidth: 1080, margin: "0 auto", padding: "32px 24px",
           display: "flex", alignItems: "center", justifyContent: "space-between",
           flexWrap: "wrap", gap: 12,
         }}>
-          <span style={{ fontSize: 13, fontWeight: 800, letterSpacing: "0.12em", color: "#111827" }}>NEXORA</span>
-          <p style={{ fontSize: 11, color: "#D1D5DB", textAlign: "center", margin: 0 }}>
-            Clari é suporte clínico. A decisão médica é sempre do profissional de saúde.
+          <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.14em", color: "#D1D5DB" }}>NEXORA</span>
+          <p style={{ fontSize: 11, color: "#E5E7EB", textAlign: "center", margin: 0 }}>
+            Clari é suporte clínico. A decisão médica é sempre do profissional.
           </p>
-          <p style={{ fontSize: 11, color: "#D1D5DB", margin: 0 }}>© {new Date().getFullYear()}</p>
+          <p style={{ fontSize: 11, color: "#E5E7EB", margin: 0 }}>© {new Date().getFullYear()}</p>
         </div>
       </footer>
 
