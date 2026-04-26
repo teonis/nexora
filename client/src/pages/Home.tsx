@@ -355,58 +355,124 @@ function AnimatedMockup() {
   const stepContents = [recordingContent, transcribingContent, soapContent, clariContent];
 
   return (
-    <div style={{ marginTop: 72, position: "relative" }}>
+    <div style={{ marginTop: 56, position: "relative" }}>
       {/* Glow */}
       <div style={{
         position: "absolute", inset: "-40px",
         background: "radial-gradient(ellipse 70% 50% at 50% 60%, rgba(201,166,70,0.09) 0%, transparent 70%)",
         pointerEvents: "none",
       }} />
-      <div style={{
-        background: "#fff",
-        borderRadius: 16,
-        border: "1px solid rgba(17,24,39,0.08)",
-        boxShadow: "0 8px 40px rgba(17,24,39,0.08), 0 1px 3px rgba(17,24,39,0.06)",
-        overflow: "hidden",
-        maxWidth: 780,
-        margin: "0 auto",
-        position: "relative",
-      }}>
-        {/* Browser bar */}
+
+      {/* Responsive CSS */}
+      <style>{`
+        @keyframes pulse {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.4; transform: scale(0.85); }
+        }
+        .mockup-shell {
+          background: #fff;
+          border-radius: 16px;
+          border: 1px solid rgba(17,24,39,0.08);
+          box-shadow: 0 8px 40px rgba(17,24,39,0.08), 0 1px 3px rgba(17,24,39,0.06);
+          overflow: hidden;
+          max-width: 780px;
+          margin: 0 auto;
+          position: relative;
+        }
+        .spec-tabs {
+          border-bottom: 1px solid rgba(17,24,39,0.07);
+          padding: 0 16px;
+          display: flex;
+          gap: 0;
+          overflow-x: auto;
+          background: #FAFAFA;
+          -webkit-overflow-scrolling: touch;
+          scrollbar-width: none;
+        }
+        .spec-tabs::-webkit-scrollbar { display: none; }
+        .spec-tab {
+          font-size: 11px;
+          padding: 10px 12px;
+          background: none;
+          border: none;
+          cursor: pointer;
+          white-space: nowrap;
+          font-family: inherit;
+          transition: all 0.2s;
+          flex-shrink: 0;
+        }
+        .mockup-body {
+          padding: 18px 18px 16px;
+          display: grid;
+          grid-template-columns: 140px 1fr;
+          gap: 16px;
+        }
+        .mockup-sidebar {
+          border-right: 1px solid #F3F4F6;
+          padding-right: 12px;
+        }
+        @media (max-width: 600px) {
+          .mockup-shell {
+            border-radius: 12px;
+            margin: 0 4px;
+          }
+          .spec-tab {
+            font-size: 10px;
+            padding: 9px 10px;
+          }
+          .mockup-body {
+            padding: 14px 14px 12px;
+            grid-template-columns: 1fr;
+            gap: 12px;
+          }
+          .mockup-sidebar {
+            border-right: none;
+            border-bottom: 1px solid #F3F4F6;
+            padding-right: 0;
+            padding-bottom: 10px;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            gap: 4px;
+          }
+          .mockup-sidebar-title { display: none; }
+          .mockup-step-item {
+            border-left: none !important;
+            border-bottom: 2px solid transparent;
+            padding: 5px 8px !important;
+            border-radius: 20px !important;
+            font-size: 10px !important;
+          }
+        }
+      `}</style>
+
+      <div className="mockup-shell">
+        {/* Browser bar — hidden on mobile */}
         <div style={{
           background: "#F3F4F6",
           borderBottom: "1px solid rgba(17,24,39,0.07)",
-          padding: "10px 16px",
+          padding: "8px 14px",
           display: "flex", alignItems: "center", gap: 8,
         }}>
-          <div style={{ display: "flex", gap: 6 }}>
+          <div style={{ display: "flex", gap: 5 }}>
             {["#FF5F57","#FEBC2E","#28C840"].map(c => (
-              <div key={c} style={{ width: 10, height: 10, borderRadius: "50%", background: c }} />
+              <div key={c} style={{ width: 9, height: 9, borderRadius: "50%", background: c }} />
             ))}
           </div>
-          <div style={{ flex: 1, background: "#E5E7EB", borderRadius: 6, height: 20, marginLeft: 8 }} />
+          <div style={{ flex: 1, background: "#E5E7EB", borderRadius: 5, height: 17, marginLeft: 8 }} />
         </div>
 
-        {/* Specialty tabs */}
-        <div style={{
-          borderBottom: "1px solid rgba(17,24,39,0.07)",
-          padding: "0 20px",
-          display: "flex", gap: 0, overflowX: "auto",
-          background: "#FAFAFA",
-        }}>
+        {/* Specialty tabs — horizontal scroll on mobile */}
+        <div className="spec-tabs">
           {SPECIALTIES.map((sp, i) => (
             <button
               key={sp.id}
               onClick={() => changeSpec(i)}
+              className="spec-tab"
               style={{
-                fontSize: 11, fontWeight: i === specIdx ? 600 : 400,
-                padding: "10px 14px",
+                fontWeight: i === specIdx ? 600 : 400,
                 color: i === specIdx ? "#111827" : "#9CA3AF",
-                background: "none", border: "none", cursor: "pointer",
                 borderBottom: i === specIdx ? "2px solid #C9A646" : "2px solid transparent",
-                whiteSpace: "nowrap",
-                fontFamily: "inherit",
-                transition: "all 0.2s",
               }}
             >
               {sp.emoji} {sp.label}
@@ -414,78 +480,85 @@ function AnimatedMockup() {
           ))}
         </div>
 
-        {/* Dashboard layout */}
-        <div style={{
-          padding: "20px 20px 18px",
-          display: "grid", gridTemplateColumns: "150px 1fr", gap: 18,
-          opacity: specVisible ? 1 : 0,
-          transition: "opacity 0.28s ease",
-        }}>
-          {/* Sidebar */}
-          <div style={{ borderRight: "1px solid #F3F4F6", paddingRight: 14 }}>
-            <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.12em", color: "#111827", marginBottom: 14 }}>NEXORA</div>
-            {STEPS.map((s, i) => {
-              const SIcon = s.icon;
-              const active = i === step;
-              return (
-                <div
-                  key={s.id}
-                  onClick={() => { setVisible(false); setTimeout(() => { setStep(i); setVisible(true); }, 200); }}
-                  style={{
-                    fontSize: 11, padding: "6px 9px", borderRadius: 7, marginBottom: 3,
-                    background: active ? "#F9FAFB" : "transparent",
-                    color: active ? "#111827" : "#9CA3AF",
-                    fontWeight: active ? 600 : 400,
-                    borderLeft: active ? `2px solid ${s.color}` : "2px solid transparent",
-                    cursor: "pointer",
-                    display: "flex", alignItems: "center", gap: 6,
-                    transition: "all 0.2s",
-                  }}
-                >
-                  <SIcon size={11} color={active ? s.color : "#9CA3AF"} />
-                  {s.label}
-                </div>
-              );
-            })}
+        {/* Body: sidebar + main — stacks vertically on mobile */}
+        <div
+          className="mockup-body"
+          style={{ opacity: specVisible ? 1 : 0, transition: "opacity 0.28s ease" }}
+        >
+          {/* Sidebar / step nav */}
+          <div className="mockup-sidebar">
+            <div
+              className="mockup-sidebar-title"
+              style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.12em", color: "#111827", marginBottom: 12 }}
+            >NEXORA</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              {STEPS.map((s, i) => {
+                const SIcon = s.icon;
+                const active = i === step;
+                return (
+                  <div
+                    key={s.id}
+                    onClick={() => { setVisible(false); setTimeout(() => { setStep(i); setVisible(true); }, 200); }}
+                    className="mockup-step-item"
+                    style={{
+                      fontSize: 11, padding: "6px 9px", borderRadius: 7,
+                      background: active ? "#F9FAFB" : "transparent",
+                      color: active ? "#111827" : "#9CA3AF",
+                      fontWeight: active ? 600 : 400,
+                      borderLeft: `2px solid ${active ? s.color : "transparent"}`,
+                      cursor: "pointer",
+                      display: "flex", alignItems: "center", gap: 6,
+                      transition: "all 0.2s",
+                    }}
+                  >
+                    <SIcon size={11} color={active ? s.color : "#9CA3AF"} />
+                    {s.label}
+                  </div>
+                );
+              })}
+            </div>
           </div>
 
           {/* Main panel */}
           <div>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
               <div style={{
                 width: 26, height: 26, borderRadius: 8,
                 background: current.bg,
                 display: "flex", alignItems: "center", justifyContent: "center",
+                flexShrink: 0,
                 transition: "background 0.3s",
               }}>
                 <Icon size={13} color={current.color} />
               </div>
-              <div>
-                <div style={{ fontSize: 12, fontWeight: 700, color: "#111827" }}>Consulta em andamento</div>
-                <div style={{ fontSize: 10, color: "#9CA3AF" }}>Dr. Silva · Paciente: {spec.patient}</div>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "#111827", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>Consulta em andamento</div>
+                <div style={{ fontSize: 10, color: "#9CA3AF", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>Dr. Silva · {spec.patient}</div>
               </div>
-              {/* Step indicators */}
-              <div style={{ marginLeft: "auto", display: "flex", gap: 5 }}>
+              {/* Step dots */}
+              <div style={{ marginLeft: "auto", display: "flex", gap: 4, flexShrink: 0 }}>
                 {STEPS.map((_, i) => (
-                  <div key={i} style={{
-                    width: i === step ? 14 : 5, height: 5, borderRadius: 3,
-                    background: i === step ? current.color : "#E5E7EB",
-                    transition: "all 0.3s",
-                    cursor: "pointer",
-                  }}
+                  <div
+                    key={i}
                     onClick={() => { setVisible(false); setTimeout(() => { setStep(i); setVisible(true); }, 200); }}
+                    style={{
+                      width: i === step ? 14 : 5, height: 5, borderRadius: 3,
+                      background: i === step ? current.color : "#E5E7EB",
+                      transition: "all 0.3s",
+                      cursor: "pointer",
+                    }}
                   />
                 ))}
               </div>
             </div>
 
-            {/* Animated content area */}
+            {/* Animated content */}
             <div style={{
               background: "#F9FAFB",
               borderRadius: 12,
-              padding: "14px",
+              padding: "13px",
               border: "1px solid rgba(17,24,39,0.06)",
-              minHeight: 130,
+              minHeight: 120,
               opacity: visible ? 1 : 0,
               transform: visible ? "translateY(0)" : "translateY(6px)",
               transition: "opacity 0.35s ease, transform 0.35s ease",
@@ -495,14 +568,6 @@ function AnimatedMockup() {
           </div>
         </div>
       </div>
-
-      {/* Pulse animation style */}
-      <style>{`
-        @keyframes pulse {
-          0%, 100% { opacity: 1; transform: scale(1); }
-          50% { opacity: 0.4; transform: scale(0.85); }
-        }
-      `}</style>
     </div>
   );
 }
@@ -518,6 +583,28 @@ export default function Home() {
 
   return (
     <div style={{ background: "#F9FAFB", color: "#111827", fontFamily: "Inter, system-ui, sans-serif" }}>
+      {/* Global responsive styles for landing page */}
+      <style>{`
+        .lp-hero { padding: 120px 24px 80px; }
+        .lp-section-lg { padding: 120px 24px; }
+        .lp-section-cta { padding: 120px 24px 140px; }
+        .lp-clari-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+        .lp-nav-links { display: flex; align-items: center; gap: 32px; }
+        .lp-nav-clari { display: block; }
+        @media (max-width: 768px) {
+          .lp-hero { padding: 72px 20px 56px; }
+          .lp-section-lg { padding: 72px 20px; }
+          .lp-section-cta { padding: 72px 20px 100px; }
+          .lp-clari-grid { grid-template-columns: 1fr; gap: 40px; }
+          .lp-nav-clari { display: none; }
+          .lp-nav-links { gap: 16px; }
+        }
+        @media (max-width: 480px) {
+          .lp-hero { padding: 56px 16px 40px; }
+          .lp-section-lg { padding: 56px 16px; }
+          .lp-section-cta { padding: 56px 16px 80px; }
+        }
+      `}</style>
 
       {/* ─── NAVBAR ─── */}
       <header style={{
@@ -526,14 +613,15 @@ export default function Home() {
         backdropFilter: "blur(12px)",
         borderBottom: "1px solid rgba(17,24,39,0.06)",
       }}>
-        <div style={{ maxWidth: 1080, margin: "0 auto", padding: "0 24px", height: 60, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div style={{ maxWidth: 1080, margin: "0 auto", padding: "0 20px", height: 60, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           {/* Logo */}
           <span style={{ fontSize: 15, fontWeight: 800, letterSpacing: "0.12em", color: "#111827" }}>NEXORA</span>
 
           {/* Nav */}
-          <nav style={{ display: "flex", alignItems: "center", gap: 32 }}>
+          <nav className="lp-nav-links">
             <button
               onClick={() => document.getElementById("clari")?.scrollIntoView({ behavior: "smooth" })}
+              className="lp-nav-clari"
               style={{ fontSize: 14, color: "#6B7280", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}
               onMouseEnter={e => (e.currentTarget.style.color = "#111827")}
               onMouseLeave={e => (e.currentTarget.style.color = "#6B7280")}
@@ -559,7 +647,7 @@ export default function Home() {
       </header>
 
       {/* ─── HERO ─── */}
-      <section style={{ maxWidth: 1080, margin: "0 auto", padding: "120px 24px 80px", textAlign: "center" }}>
+      <section className="lp-hero" style={{ maxWidth: 1080, margin: "0 auto", textAlign: "center" }}>
         <FadeIn>
           {/* Label */}
           <div style={{ display: "inline-flex", alignItems: "center", gap: 6, marginBottom: 28 }}>
@@ -647,7 +735,7 @@ export default function Home() {
       </div>
 
       {/* ─── VALUE ─── */}
-      <section id="valor" style={{ maxWidth: 680, margin: "0 auto", padding: "120px 24px", textAlign: "center" }}>
+      <section id="valor" className="lp-section-lg" style={{ maxWidth: 680, margin: "0 auto", textAlign: "center" }}>
         <FadeIn>
           <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "#C9A646", marginBottom: 24 }}>
             Por que a NEXORA
@@ -674,8 +762,8 @@ export default function Home() {
       </div>
 
       {/* ─── CLARI ─── */}
-      <section id="clari" style={{ maxWidth: 1080, margin: "0 auto", padding: "120px 24px" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 80, alignItems: "center" }}>
+      <section id="clari" className="lp-section-lg" style={{ maxWidth: 1080, margin: "0 auto" }}>
+        <div className="lp-clari-grid">
           {/* Text */}
           <FadeIn>
             <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "#C9A646", marginBottom: 20 }}>
@@ -833,7 +921,7 @@ export default function Home() {
       </div>
 
       {/* ─── FINAL CTA ─── */}
-      <section style={{ maxWidth: 680, margin: "0 auto", padding: "120px 24px 140px", textAlign: "center" }}>
+      <section className="lp-section-cta" style={{ maxWidth: 680, margin: "0 auto", textAlign: "center" }}>
         <FadeIn>
           <h2 style={{
             fontSize: "clamp(1.8rem, 4vw, 2.8rem)",
