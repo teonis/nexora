@@ -1,6 +1,8 @@
 import { ArrowLeft, CheckCircle2, Mail, MessageSquare, Send } from "lucide-react";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
+
+const STORAGE_KEY = "nexora_contact_form";
 
 // ─── Validation helpers ────────────────────────────────────────────────────────
 const validators = {
@@ -28,16 +30,51 @@ const validators = {
 };
 
 type Field = keyof typeof validators;
+type FormData = { name: string; email: string; subject: string; message: string };
+
+const emptyForm: FormData = { name: "", email: "", subject: "", message: "" };
+const emptyTouched: Record<Field, boolean> = { name: false, email: false, subject: false, message: false };
 
 // ─── Component ─────────────────────────────────────────────────────────────────
 export default function Contact() {
-  const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
-  const [touched, setTouched] = useState<Record<Field, boolean>>({ name: false, email: false, subject: false, message: false });
+  // Restore from localStorage on mount
+  const [form, setForm] = useState<FormData>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved) as Partial<FormData>;
+        return {
+          name: parsed.name ?? "",
+          email: parsed.email ?? "",
+          subject: parsed.subject ?? "",
+          message: parsed.message ?? "",
+        };
+      }
+    } catch { /* ignore */ }
+    return { ...emptyForm };
+  });
+
+  const [touched, setTouched] = useState<Record<Field, boolean>>({ ...emptyTouched });
   const [sent, setSent] = useState(false);
   const [serverError, setServerError] = useState("");
+  const [savedIndicator, setSavedIndicator] = useState(false);
+
+  // Persist to localStorage on every change
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(form));
+      // Brief "salvo" indicator
+      setSavedIndicator(true);
+      const t = setTimeout(() => setSavedIndicator(false), 1200);
+      return () => clearTimeout(t);
+    } catch { /* ignore */ }
+  }, [form]);
 
   const sendContact = trpc.contact.send.useMutation({
-    onSuccess: () => setSent(true),
+    onSuccess: () => {
+      setSent(true);
+      try { localStorage.removeItem(STORAGE_KEY); } catch { /* ignore */ }
+    },
     onError: (err) => setServerError(err.message || "Erro ao enviar. Tente novamente."),
   });
 
@@ -53,7 +90,6 @@ export default function Contact() {
 
   const handleChange = useCallback((field: Field, value: string) => {
     setForm(f => ({ ...f, [field]: value }));
-    // Mark touched on first change
     setTouched(t => ({ ...t, [field]: true }));
   }, []);
 
@@ -63,11 +99,17 @@ export default function Contact() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Touch all fields to show all errors
     setTouched({ name: true, email: true, subject: true, message: true });
     if (!isFormValid) return;
     setServerError("");
     sendContact.mutate(form);
+  };
+
+  const handleReset = () => {
+    setSent(false);
+    setForm({ ...emptyForm });
+    setTouched({ ...emptyTouched });
+    try { localStorage.removeItem(STORAGE_KEY); } catch { /* ignore */ }
   };
 
   // ─── Styles ─────────────────────────────────────────────────────────────────
@@ -82,6 +124,12 @@ export default function Contact() {
       transition: "border-color 0.15s, background 0.15s", boxSizing: "border-box",
     };
   };
+
+  const errorIcon = (
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+      <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
+  );
 
   const charCount = form.message.length;
   const charLimit = 2000;
@@ -144,10 +192,8 @@ export default function Contact() {
             </div>
             <h2 style={{ fontSize: 20, fontWeight: 600, color: "#111827", margin: "0 0 8px" }}>Mensagem enviada</h2>
             <p style={{ fontSize: 14, color: "#6B7280", margin: "0 0 32px" }}>Obrigado pelo contato. Responderemos em breve.</p>
-            <button
-              onClick={() => { setSent(false); setForm({ name: "", email: "", subject: "", message: "" }); setTouched({ name: false, email: false, subject: false, message: false }); }}
-              style={{ fontSize: 13, color: "#9CA3AF", background: "none", border: "none", cursor: "pointer", textDecoration: "underline", fontFamily: "inherit" }}
-            >
+            <button onClick={handleReset}
+              style={{ fontSize: 13, color: "#9CA3AF", background: "none", border: "none", cursor: "pointer", textDecoration: "underline", fontFamily: "inherit" }}>
               Enviar outra mensagem
             </button>
           </div>
@@ -163,9 +209,7 @@ export default function Contact() {
                   {touched.name && !errors.name && form.name && <CheckCircle2 size={11} color="#16A34A" />}
                 </label>
                 <input
-                  type="text"
-                  placeholder="Dr. João Silva"
-                  value={form.name}
+                  type="text" placeholder="Dr. João Silva" value={form.name}
                   onChange={e => handleChange("name", e.target.value)}
                   onBlur={() => handleBlur("name")}
                   style={getInputStyle("name")}
@@ -173,8 +217,7 @@ export default function Contact() {
                 />
                 {touched.name && errors.name && (
                   <span style={{ fontSize: 11, color: "#DC2626", display: "flex", alignItems: "center", gap: 4 }}>
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                    {errors.name}
+                    {errorIcon}{errors.name}
                   </span>
                 )}
               </div>
@@ -186,9 +229,7 @@ export default function Contact() {
                   {touched.email && !errors.email && form.email && <CheckCircle2 size={11} color="#16A34A" />}
                 </label>
                 <input
-                  type="email"
-                  placeholder="joao@clinica.com.br"
-                  value={form.email}
+                  type="email" placeholder="joao@clinica.com.br" value={form.email}
                   onChange={e => handleChange("email", e.target.value)}
                   onBlur={() => handleBlur("email")}
                   style={getInputStyle("email")}
@@ -196,8 +237,7 @@ export default function Contact() {
                 />
                 {touched.email && errors.email && (
                   <span style={{ fontSize: 11, color: "#DC2626", display: "flex", alignItems: "center", gap: 4 }}>
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                    {errors.email}
+                    {errorIcon}{errors.email}
                   </span>
                 )}
               </div>
@@ -225,8 +265,7 @@ export default function Contact() {
               </select>
               {touched.subject && errors.subject && (
                 <span style={{ fontSize: 11, color: "#DC2626", display: "flex", alignItems: "center", gap: 4 }}>
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                  {errors.subject}
+                  {errorIcon}{errors.subject}
                 </span>
               )}
             </div>
@@ -238,20 +277,16 @@ export default function Contact() {
                 {touched.message && !errors.message && form.message && <CheckCircle2 size={11} color="#16A34A" />}
               </label>
               <textarea
-                rows={5}
-                placeholder="Descreva sua dúvida ou solicitação..."
-                value={form.message}
+                rows={5} placeholder="Descreva sua dúvida ou solicitação..." value={form.message}
                 onChange={e => handleChange("message", e.target.value)}
                 onBlur={() => handleBlur("message")}
                 style={{ ...getInputStyle("message"), resize: "vertical", minHeight: 120 }}
                 onFocus={e => { if (!touched.message || !errors.message) { e.currentTarget.style.borderColor = "#C9A646"; e.currentTarget.style.background = "#fff"; } }}
               />
-              {/* Char counter + error */}
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 {touched.message && errors.message ? (
                   <span style={{ fontSize: 11, color: "#DC2626", display: "flex", alignItems: "center", gap: 4 }}>
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                    {errors.message}
+                    {errorIcon}{errors.message}
                   </span>
                 ) : <span />}
                 <span style={{ fontSize: 11, color: charCount > charLimit * 0.9 ? "#DC2626" : "#9CA3AF" }}>
@@ -263,27 +298,39 @@ export default function Contact() {
             {/* Server error */}
             {serverError && (
               <div style={{ padding: "10px 14px", background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 8, fontSize: 12, color: "#DC2626", display: "flex", alignItems: "center", gap: 8 }}>
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                {serverError}
+                {errorIcon}{serverError}
               </div>
             )}
 
-            {/* Submit */}
+            {/* Submit row */}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              {/* Progress indicator */}
-              <div style={{ display: "flex", gap: 4 }}>
-                {(["name", "email", "subject", "message"] as Field[]).map(field => (
-                  <div key={field} style={{
-                    width: 6, height: 6, borderRadius: "50%",
-                    background: !form[field] ? "#E5E7EB" : errors[field] ? "#FCA5A5" : "#86EFAC",
-                    transition: "background 0.2s",
-                  }} />
-                ))}
+              {/* Progress dots + autosave indicator */}
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <div style={{ display: "flex", gap: 4 }}>
+                  {(["name", "email", "subject", "message"] as Field[]).map(field => (
+                    <div key={field} style={{
+                      width: 6, height: 6, borderRadius: "50%",
+                      background: !form[field] ? "#E5E7EB" : errors[field] ? "#FCA5A5" : "#86EFAC",
+                      transition: "background 0.2s",
+                    }} />
+                  ))}
+                </div>
+                {/* Autosave badge */}
+                <span style={{
+                  fontSize: 10, color: savedIndicator ? "#16A34A" : "#D1D5DB",
+                  transition: "color 0.3s", letterSpacing: "0.04em",
+                  display: "flex", alignItems: "center", gap: 3,
+                }}>
+                  {savedIndicator ? (
+                    <><CheckCircle2 size={10} color="#16A34A" /> Salvo</>
+                  ) : (
+                    "Rascunho salvo"
+                  )}
+                </span>
               </div>
 
               <button
-                type="submit"
-                disabled={sendContact.isPending}
+                type="submit" disabled={sendContact.isPending}
                 style={{
                   display: "flex", alignItems: "center", gap: 8,
                   padding: "10px 24px", fontSize: 13, fontWeight: 500,
