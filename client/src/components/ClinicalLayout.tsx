@@ -3,7 +3,6 @@ import { getLoginUrl } from "@/const";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/contexts/ThemeContext";
 import {
-  Activity,
   Bot,
   FileText,
   Home,
@@ -135,12 +134,14 @@ export default function ClinicalLayout({ children, title, subtitle, actions }: C
       >
         {/* Logo */}
         <div className="flex items-center justify-between px-5 h-16 border-b border-sidebar-border flex-shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-              <Activity className="w-4 h-4 text-primary" />
-            </div>
+          <div className="flex items-center gap-2.5">
+            <img
+              src="/manus-storage/2_19b7e141.png"
+              alt="NEXORA"
+              className="w-8 h-8 object-contain flex-shrink-0"
+            />
             <div>
-              <p className="text-sm font-bold text-sidebar-foreground leading-none tracking-tight">NEXORA</p>
+              <p className="text-sm font-bold text-sidebar-foreground leading-none" style={{ fontFamily: "'Sora', sans-serif", letterSpacing: "0.1em" }}>NEXORA</p>
               <p className="text-[10px] text-muted-foreground mt-0.5">Plataforma Clínica com IA</p>
             </div>
           </div>

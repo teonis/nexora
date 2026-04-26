@@ -483,8 +483,11 @@ function AnimatedMockup() {
           <div className="mockup-sidebar">
             <div
               className="mockup-sidebar-title"
-              style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.12em", color: "#111827", marginBottom: 12 }}
-            >NEXORA</div>
+              style={{ marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}
+            >
+              <img src="/manus-storage/2_19b7e141.png" alt="NEXORA" style={{ width: 18, height: 18, objectFit: "contain" }} />
+              <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.12em", color: "#111827" }}>NEXORA</span>
+            </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
               {STEPS.map((s, i) => {
                 const SIcon = s.icon;
@@ -926,7 +929,7 @@ export default function Home() {
       }}>
         <div style={{ maxWidth: 1080, margin: "0 auto", padding: "0 20px", height: 60, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           {/* Logo */}
-          <span style={{ fontSize: 14, fontWeight: 700, letterSpacing: "0.14em", color: "#111827" }}>NEXORA</span>
+          <img src="/manus-storage/4_7e59f0e2.png" alt="NEXORA" style={{ height: 28, objectFit: "contain" }} />
 
           {/* Nav */}
           <nav className="lp-nav-links">
@@ -1157,7 +1160,7 @@ export default function Home() {
           <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: 24 }}>
             {/* Brand */}
             <div>
-              <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.12em", color: "#111827" }}>NEXORA</span>
+              <img src="/manus-storage/4_7e59f0e2.png" alt="NEXORA" style={{ height: 22, objectFit: "contain", marginBottom: 6 }} />
               <p style={{ fontSize: 12, color: "#9CA3AF", marginTop: 4, maxWidth: 260, lineHeight: 1.6 }}>
                 Plataforma de inteligência clínica com IA para médicos.
               </p>

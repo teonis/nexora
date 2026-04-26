@@ -289,7 +289,7 @@ export default function Features() {
         borderBottom: "1px solid rgba(17,24,39,0.05)",
       }}>
         <div style={{ maxWidth: 1080, margin: "0 auto", padding: "0 20px", height: 60, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <Link href="/" style={{ fontSize: 14, fontWeight: 700, letterSpacing: "0.14em", color: "#111827", textDecoration: "none" }}>NEXORA</Link>
+          <Link href="/" style={{ textDecoration: "none" }}><img src="/manus-storage/4_7e59f0e2.png" alt="NEXORA" style={{ height: 26, objectFit: "contain" }} /></Link>
           <div style={{ display: "flex", alignItems: "center", gap: 28 }}>
             <span style={{ fontSize: 13, color: "#111827", fontWeight: 500 }}>Funcionalidades</span>
             <a
@@ -514,7 +514,7 @@ export default function Features() {
         <div style={{ maxWidth: 1080, margin: "0 auto", padding: "40px 24px 32px", display: "flex", flexDirection: "column", gap: 24 }}>
           <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: 24 }}>
             <div>
-              <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.12em", color: "#111827" }}>NEXORA</span>
+              <img src="/manus-storage/4_7e59f0e2.png" alt="NEXORA" style={{ height: 20, objectFit: "contain", marginBottom: 6 }} />
               <p style={{ fontSize: 12, color: "#9CA3AF", marginTop: 4, maxWidth: 260, lineHeight: 1.6 }}>Plataforma de inteligência clínica com IA para médicos.</p>
             </div>
             <nav style={{ display: "flex", gap: 32, flexWrap: "wrap" }}>
