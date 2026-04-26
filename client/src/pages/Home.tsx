@@ -1,54 +1,37 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { getLoginUrl } from "@/const";
-import { useTheme } from "@/contexts/ThemeContext";
-import {
-  Activity,
-  ArrowRight,
-  Bot,
-  CheckCircle2,
-  FileText,
-  Lock,
-  Mic,
-  Moon,
-  Shield,
-  Sparkles,
-  Stethoscope,
-  Sun,
-  Zap,
-} from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { ArrowRight, Bot, CheckCircle2 } from "lucide-react";
+import { useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 
-/* ─── Animated counter ─── */
-function Counter({ to, suffix = "" }: { to: number; suffix?: string }) {
-  const [count, setCount] = useState(0);
-  const ref = useRef<HTMLSpanElement>(null);
+/* ─── Fade-in on scroll ─── */
+function FadeIn({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
+  const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    el.style.opacity = "0";
+    el.style.transform = "translateY(18px)";
+    el.style.transition = `opacity 0.65s ease ${delay}ms, transform 0.65s ease ${delay}ms`;
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          let start = 0;
-          const step = Math.ceil(to / 40);
-          const timer = setInterval(() => {
-            start += step;
-            if (start >= to) { setCount(to); clearInterval(timer); }
-            else setCount(start);
-          }, 30);
+          el.style.opacity = "1";
+          el.style.transform = "translateY(0)";
           observer.disconnect();
         }
       },
-      { threshold: 0.5 }
+      { threshold: 0.15 }
     );
-    if (ref.current) observer.observe(ref.current);
+    observer.observe(el);
     return () => observer.disconnect();
-  }, [to]);
-  return <span ref={ref}>{count}{suffix}</span>;
+  }, [delay]);
+  return <div ref={ref}>{children}</div>;
 }
 
 export default function Home() {
   const { isAuthenticated } = useAuth();
   const [, navigate] = useLocation();
-  const { theme, toggleTheme, switchable } = useTheme();
 
   if (isAuthenticated) {
     navigate("/dashboard");
@@ -56,684 +39,467 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen" style={{ background: "#0A0F1E", color: "#E8EAF0" }}>
+    <div style={{ background: "#F9FAFB", color: "#111827", fontFamily: "Inter, system-ui, sans-serif" }}>
 
       {/* ─── NAVBAR ─── */}
-      <header
-        className="sticky top-0 z-50 border-b"
-        style={{ background: "rgba(10,15,30,0.85)", backdropFilter: "blur(16px)", borderColor: "rgba(201,166,70,0.12)" }}
-      >
-        <div className="max-w-6xl mx-auto px-6 flex items-center justify-between h-16">
+      <header style={{
+        position: "sticky", top: 0, zIndex: 50,
+        background: "rgba(249,250,251,0.85)",
+        backdropFilter: "blur(12px)",
+        borderBottom: "1px solid rgba(17,24,39,0.06)",
+      }}>
+        <div style={{ maxWidth: 1080, margin: "0 auto", padding: "0 24px", height: 60, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           {/* Logo */}
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: "rgba(201,166,70,0.12)", border: "1px solid rgba(201,166,70,0.25)" }}>
-              <Activity className="w-4 h-4" style={{ color: "#C9A646" }} />
-            </div>
-            <div>
-              <span className="text-sm font-black tracking-widest uppercase" style={{ color: "#E8EAF0", letterSpacing: "0.15em" }}>NEXORA</span>
-            </div>
-          </div>
+          <span style={{ fontSize: 15, fontWeight: 800, letterSpacing: "0.12em", color: "#111827" }}>NEXORA</span>
 
-          {/* Nav links */}
-          <nav className="hidden md:flex items-center gap-8">
-            {["Funcionalidades", "Clari", "Segurança"].map((item) => (
-              <button
-                key={item}
-                onClick={() => document.getElementById(item.toLowerCase())?.scrollIntoView({ behavior: "smooth" })}
-                className="text-sm font-medium transition-colors duration-150"
-                style={{ color: "rgba(232,234,240,0.55)" }}
-                onMouseEnter={e => (e.currentTarget.style.color = "#C9A646")}
-                onMouseLeave={e => (e.currentTarget.style.color = "rgba(232,234,240,0.55)")}
-              >
-                {item}
-              </button>
-            ))}
-          </nav>
-
-          <div className="flex items-center gap-3">
-            {switchable && toggleTheme && (
-              <button
-                onClick={toggleTheme}
-                className="p-2 rounded-lg transition-all duration-150"
-                style={{ color: "rgba(232,234,240,0.45)" }}
-                title={theme === "dark" ? "Modo claro" : "Modo escuro"}
-              >
-                {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-              </button>
-            )}
+          {/* Nav */}
+          <nav style={{ display: "flex", alignItems: "center", gap: 32 }}>
+            <button
+              onClick={() => document.getElementById("clari")?.scrollIntoView({ behavior: "smooth" })}
+              style={{ fontSize: 14, color: "#6B7280", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}
+              onMouseEnter={e => (e.currentTarget.style.color = "#111827")}
+              onMouseLeave={e => (e.currentTarget.style.color = "#6B7280")}
+            >
+              Clari
+            </button>
             <a
               href={getLoginUrl()}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-bold transition-all duration-150"
-              style={{ background: "#C9A646", color: "#0A0F1E" }}
-              onMouseEnter={e => (e.currentTarget.style.opacity = "0.88")}
-              onMouseLeave={e => (e.currentTarget.style.opacity = "1")}
+              style={{
+                fontSize: 14, fontWeight: 600, color: "#111827",
+                background: "#fff", border: "1px solid rgba(17,24,39,0.12)",
+                padding: "7px 18px", borderRadius: 8, textDecoration: "none",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
+                transition: "box-shadow 0.15s",
+              }}
+              onMouseEnter={e => (e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.10)")}
+              onMouseLeave={e => (e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.06)")}
             >
-              Acessar plataforma
-              <ArrowRight className="w-3.5 h-3.5" />
+              Entrar
             </a>
-          </div>
+          </nav>
         </div>
       </header>
 
       {/* ─── HERO ─── */}
-      <section className="relative overflow-hidden" style={{ minHeight: "92vh", display: "flex", alignItems: "center" }}>
-        {/* Grid background */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            backgroundImage: `
-              linear-gradient(rgba(201,166,70,0.04) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(201,166,70,0.04) 1px, transparent 1px)
-            `,
-            backgroundSize: "60px 60px",
-          }}
-        />
-        {/* Glow */}
-        <div
-          className="absolute pointer-events-none"
-          style={{
-            top: "-20%",
-            right: "-10%",
-            width: "700px",
-            height: "700px",
-            background: "radial-gradient(circle, rgba(201,166,70,0.08) 0%, transparent 65%)",
-          }}
-        />
-        <div
-          className="absolute pointer-events-none"
-          style={{
-            bottom: "-10%",
-            left: "-5%",
-            width: "500px",
-            height: "500px",
-            background: "radial-gradient(circle, rgba(99,102,241,0.06) 0%, transparent 65%)",
-          }}
-        />
+      <section style={{ maxWidth: 1080, margin: "0 auto", padding: "120px 24px 80px", textAlign: "center" }}>
+        <FadeIn>
+          {/* Label */}
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 6, marginBottom: 28 }}>
+            <span style={{
+              fontSize: 12, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase",
+              color: "#C9A646", background: "rgba(201,166,70,0.08)",
+              padding: "5px 12px", borderRadius: 20,
+              border: "1px solid rgba(201,166,70,0.18)",
+            }}>
+              Inteligência clínica em tempo real
+            </span>
+          </div>
 
-        <div className="max-w-6xl mx-auto px-6 py-24 w-full">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            {/* Left */}
-            <div>
-              {/* Eyebrow */}
-              <div
-                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold mb-8 tracking-widest uppercase"
-                style={{ background: "rgba(201,166,70,0.08)", border: "1px solid rgba(201,166,70,0.2)", color: "#C9A646" }}
-              >
-                <Sparkles className="w-3 h-3" />
-                Inteligência Clínica com IA
-              </div>
+          {/* Headline */}
+          <h1 style={{
+            fontSize: "clamp(2.4rem, 5.5vw, 4rem)",
+            fontWeight: 800,
+            lineHeight: 1.08,
+            letterSpacing: "-0.03em",
+            color: "#111827",
+            margin: "0 auto 20px",
+            maxWidth: 680,
+          }}>
+            Menos burocracia.<br />
+            <span style={{ color: "#C9A646" }}>Mais medicina.</span>
+          </h1>
 
-              <h1
-                className="font-black leading-[1.02] mb-6"
-                style={{ fontSize: "clamp(2.5rem, 5vw, 4rem)", letterSpacing: "-0.03em", fontFamily: "Manrope, Inter, sans-serif" }}
-              >
-                <span style={{ color: "#E8EAF0" }}>Menos burocracia.</span>
-                <br />
-                <span
-                  style={{
-                    background: "linear-gradient(135deg, #C9A646 0%, #E8C96A 50%, #C9A646 100%)",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                    backgroundClip: "text",
-                  }}
-                >
-                  Mais medicina.
-                </span>
-              </h1>
+          {/* Subheadline */}
+          <p style={{
+            fontSize: "clamp(1rem, 2vw, 1.2rem)",
+            color: "#6B7280",
+            lineHeight: 1.6,
+            maxWidth: 480,
+            margin: "0 auto 40px",
+            fontWeight: 400,
+          }}>
+            A NEXORA organiza sua consulta enquanto ela acontece e apoia sua decisão clínica.
+          </p>
 
-              <p className="text-lg leading-relaxed mb-8" style={{ color: "rgba(232,234,240,0.60)", maxWidth: "480px" }}>
-                Automatize sua documentação, receba suporte clínico baseado em evidências e transforme sua consulta com a{" "}
-                <strong style={{ color: "#C9A646", fontWeight: 700 }}>Clari</strong> — sua assistente inteligente em tempo real.
-              </p>
+          {/* CTAs */}
+          <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+            <a
+              href={getLoginUrl()}
+              style={{
+                display: "inline-flex", alignItems: "center", gap: 8,
+                padding: "13px 28px", borderRadius: 10,
+                background: "#111827", color: "#fff",
+                fontSize: 15, fontWeight: 600, textDecoration: "none",
+                boxShadow: "0 2px 8px rgba(17,24,39,0.18)",
+                transition: "all 0.15s",
+              }}
+              onMouseEnter={e => { e.currentTarget.style.background = "#1f2937"; e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 6px 20px rgba(17,24,39,0.22)"; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "#111827"; e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 2px 8px rgba(17,24,39,0.18)"; }}
+            >
+              Começar agora
+              <ArrowRight size={16} />
+            </a>
+            <button
+              onClick={() => document.getElementById("valor")?.scrollIntoView({ behavior: "smooth" })}
+              style={{
+                display: "inline-flex", alignItems: "center", gap: 6,
+                padding: "13px 24px", borderRadius: 10,
+                background: "transparent", color: "#6B7280",
+                fontSize: 15, fontWeight: 500, border: "1px solid rgba(17,24,39,0.10)",
+                cursor: "pointer", fontFamily: "inherit",
+                transition: "all 0.15s",
+              }}
+              onMouseEnter={e => { e.currentTarget.style.color = "#111827"; e.currentTarget.style.borderColor = "rgba(17,24,39,0.20)"; }}
+              onMouseLeave={e => { e.currentTarget.style.color = "#6B7280"; e.currentTarget.style.borderColor = "rgba(17,24,39,0.10)"; }}
+            >
+              Ver como funciona
+            </button>
+          </div>
+        </FadeIn>
 
-              <div className="flex flex-col sm:flex-row gap-3 mb-10">
-                <a
-                  href={getLoginUrl()}
-                  className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-base font-bold transition-all duration-200"
-                  style={{ background: "#C9A646", color: "#0A0F1E", boxShadow: "0 4px 24px rgba(201,166,70,0.25)" }}
-                  onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 8px 32px rgba(201,166,70,0.35)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 4px 24px rgba(201,166,70,0.25)"; }}
-                >
-                  Começar gratuitamente
-                  <ArrowRight className="w-4 h-4" />
-                </a>
-                <button
-                  onClick={() => document.getElementById("funcionalidades")?.scrollIntoView({ behavior: "smooth" })}
-                  className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-base font-semibold transition-all duration-150"
-                  style={{ border: "1px solid rgba(232,234,240,0.12)", color: "rgba(232,234,240,0.70)", background: "transparent" }}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(201,166,70,0.3)"; e.currentTarget.style.color = "#C9A646"; }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(232,234,240,0.12)"; e.currentTarget.style.color = "rgba(232,234,240,0.70)"; }}
-                >
-                  Ver funcionalidades
-                </button>
-              </div>
-
-              {/* Trust line */}
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 flex-shrink-0" style={{ color: "#C9A646" }} />
-                <p className="text-sm" style={{ color: "rgba(232,234,240,0.45)" }}>
-                  Projetado para médicos que valorizam precisão, agilidade e decisão clínica de alto nível.
-                </p>
-              </div>
-            </div>
-
-            {/* Right — Dashboard preview card */}
-            <div className="relative hidden lg:block">
-              <div
-                className="rounded-2xl overflow-hidden"
-                style={{
-                  background: "rgba(255,255,255,0.03)",
-                  border: "1px solid rgba(201,166,70,0.15)",
-                  boxShadow: "0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(201,166,70,0.08)",
-                }}
-              >
-                {/* Fake top bar */}
-                <div
-                  className="flex items-center gap-2 px-4 py-3 border-b"
-                  style={{ background: "rgba(255,255,255,0.02)", borderColor: "rgba(255,255,255,0.06)" }}
-                >
-                  <div className="w-2.5 h-2.5 rounded-full" style={{ background: "#FF5F57" }} />
-                  <div className="w-2.5 h-2.5 rounded-full" style={{ background: "#FEBC2E" }} />
-                  <div className="w-2.5 h-2.5 rounded-full" style={{ background: "#28C840" }} />
-                  <div className="flex-1 mx-3 h-5 rounded" style={{ background: "rgba(255,255,255,0.05)" }} />
+        {/* ─── Product mockup ─── */}
+        <FadeIn delay={120}>
+          <div style={{ marginTop: 72, position: "relative" }}>
+            {/* Glow */}
+            <div style={{
+              position: "absolute", inset: "-40px",
+              background: "radial-gradient(ellipse 70% 50% at 50% 60%, rgba(201,166,70,0.09) 0%, transparent 70%)",
+              pointerEvents: "none",
+            }} />
+            <div style={{
+              background: "#fff",
+              borderRadius: 16,
+              border: "1px solid rgba(17,24,39,0.08)",
+              boxShadow: "0 8px 40px rgba(17,24,39,0.08), 0 1px 3px rgba(17,24,39,0.06)",
+              overflow: "hidden",
+              maxWidth: 780,
+              margin: "0 auto",
+              position: "relative",
+            }}>
+              {/* Fake browser bar */}
+              <div style={{
+                background: "#F3F4F6",
+                borderBottom: "1px solid rgba(17,24,39,0.07)",
+                padding: "10px 16px",
+                display: "flex", alignItems: "center", gap: 8,
+              }}>
+                <div style={{ display: "flex", gap: 6 }}>
+                  {["#FF5F57","#FEBC2E","#28C840"].map(c => (
+                    <div key={c} style={{ width: 10, height: 10, borderRadius: "50%", background: c }} />
+                  ))}
                 </div>
-                {/* Content */}
-                <div className="p-6 space-y-4">
-                  {/* Header */}
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-xs font-bold tracking-widest uppercase mb-1" style={{ color: "rgba(232,234,240,0.35)" }}>NEXORA</p>
-                      <p className="text-base font-bold" style={{ color: "#E8EAF0" }}>Boa tarde, Dr. Silva</p>
-                    </div>
-                    <div
-                      className="px-3 py-1.5 rounded-lg text-xs font-bold"
-                      style={{ background: "rgba(201,166,70,0.12)", color: "#C9A646", border: "1px solid rgba(201,166,70,0.2)" }}
-                    >
-                      + Nova Consulta
-                    </div>
-                  </div>
-                  {/* Stats row */}
-                  <div className="grid grid-cols-3 gap-3">
+                <div style={{ flex: 1, background: "#E5E7EB", borderRadius: 6, height: 20, marginLeft: 8 }} />
+              </div>
+
+              {/* Dashboard preview */}
+              <div style={{ padding: "28px 28px 24px", display: "grid", gridTemplateColumns: "180px 1fr", gap: 20 }}>
+                {/* Sidebar */}
+                <div style={{ borderRight: "1px solid #F3F4F6", paddingRight: 20 }}>
+                  <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.12em", color: "#111827", marginBottom: 20 }}>NEXORA</div>
+                  {["Dashboard", "Pacientes", "Nova Consulta", "Clari", "Documentos"].map((item, i) => (
+                    <div key={item} style={{
+                      fontSize: 12, padding: "7px 10px", borderRadius: 7, marginBottom: 3,
+                      background: i === 0 ? "#F9FAFB" : "transparent",
+                      color: i === 0 ? "#111827" : "#9CA3AF",
+                      fontWeight: i === 0 ? 600 : 400,
+                      borderLeft: i === 0 ? "2px solid #C9A646" : "2px solid transparent",
+                    }}>{item}</div>
+                  ))}
+                </div>
+
+                {/* Main content */}
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: "#111827", marginBottom: 4 }}>Boa tarde, Dr. Silva</div>
+                  <div style={{ fontSize: 11, color: "#9CA3AF", marginBottom: 20 }}>Domingo, 27 de abril de 2025</div>
+
+                  {/* Stats */}
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10, marginBottom: 20 }}>
                     {[
-                      { label: "Hoje", value: "8" },
+                      { label: "Consultas hoje", value: "8" },
                       { label: "Pacientes", value: "142" },
                       { label: "Documentos", value: "31" },
                     ].map(({ label, value }) => (
-                      <div
-                        key={label}
-                        className="rounded-xl p-3 text-center"
-                        style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}
-                      >
-                        <p className="text-xl font-black" style={{ color: "#C9A646" }}>{value}</p>
-                        <p className="text-[10px] mt-0.5" style={{ color: "rgba(232,234,240,0.40)" }}>{label}</p>
+                      <div key={label} style={{
+                        background: "#F9FAFB", borderRadius: 10, padding: "12px 14px",
+                        border: "1px solid rgba(17,24,39,0.06)",
+                      }}>
+                        <div style={{ fontSize: 18, fontWeight: 800, color: "#111827" }}>{value}</div>
+                        <div style={{ fontSize: 10, color: "#9CA3AF", marginTop: 2 }}>{label}</div>
                       </div>
                     ))}
                   </div>
-                  {/* Clari chat preview */}
-                  <div
-                    className="rounded-xl p-4"
-                    style={{ background: "rgba(201,166,70,0.05)", border: "1px solid rgba(201,166,70,0.12)" }}
-                  >
-                    <div className="flex items-center gap-2 mb-3">
-                      <div
-                        className="w-6 h-6 rounded-full flex items-center justify-center"
-                        style={{ background: "rgba(201,166,70,0.15)" }}
-                      >
-                        <Bot className="w-3 h-3" style={{ color: "#C9A646" }} />
+
+                  {/* Clari card */}
+                  <div style={{
+                    background: "rgba(201,166,70,0.05)",
+                    border: "1px solid rgba(201,166,70,0.15)",
+                    borderRadius: 10, padding: "12px 14px",
+                  }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                      <div style={{
+                        width: 24, height: 24, borderRadius: "50%",
+                        background: "rgba(201,166,70,0.12)",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                      }}>
+                        <Bot size={12} color="#C9A646" />
                       </div>
-                      <span className="text-xs font-bold" style={{ color: "#C9A646" }}>Clari</span>
-                      <span
-                        className="ml-auto text-[9px] font-bold px-1.5 py-0.5 rounded-full"
-                        style={{ background: "rgba(201,166,70,0.15)", color: "#C9A646" }}
-                      >IA</span>
+                      <span style={{ fontSize: 11, fontWeight: 700, color: "#C9A646" }}>Clari</span>
+                      <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#22C55E", marginLeft: "auto" }} />
                     </div>
-                    <p className="text-xs leading-relaxed" style={{ color: "rgba(232,234,240,0.65)" }}>
-                      Análise da consulta concluída. SOAP gerado automaticamente. Deseja revisar as hipóteses diagnósticas?
+                    <p style={{ fontSize: 11, color: "#6B7280", lineHeight: 1.5, margin: 0 }}>
+                      SOAP gerado automaticamente. Deseja revisar as hipóteses diagnósticas?
                     </p>
                   </div>
-                  {/* SOAP tag */}
-                  <div className="flex gap-2">
-                    {["Subjetivo", "Objetivo", "Avaliação", "Plano"].map((tag, i) => (
-                      <div
-                        key={tag}
-                        className="flex-1 text-center py-1.5 rounded-lg text-[9px] font-bold"
-                        style={{
-                          background: i === 2 ? "rgba(201,166,70,0.15)" : "rgba(255,255,255,0.04)",
-                          color: i === 2 ? "#C9A646" : "rgba(232,234,240,0.35)",
-                          border: `1px solid ${i === 2 ? "rgba(201,166,70,0.25)" : "rgba(255,255,255,0.06)"}`,
-                        }}
-                      >
-                        {tag}
-                      </div>
-                    ))}
-                  </div>
                 </div>
               </div>
-              {/* Glow behind card */}
-              <div
-                className="absolute -inset-8 -z-10 pointer-events-none"
-                style={{ background: "radial-gradient(ellipse, rgba(201,166,70,0.07) 0%, transparent 70%)" }}
-              />
             </div>
           </div>
-        </div>
+        </FadeIn>
       </section>
 
-      {/* ─── STATS BAR ─── */}
-      <section style={{ background: "rgba(201,166,70,0.06)", borderTop: "1px solid rgba(201,166,70,0.12)", borderBottom: "1px solid rgba(201,166,70,0.12)" }}>
-        <div className="max-w-6xl mx-auto px-6 py-10">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            {[
-              { value: 60, suffix: "%", label: "Redução no tempo de documentação" },
-              { value: 4, suffix: "x", label: "Mais agilidade na consulta" },
-              { value: 100, suffix: "%", label: "Conformidade com LGPD" },
-              { value: 24, suffix: "/7", label: "Clari disponível" },
-            ].map(({ value, suffix, label }) => (
-              <div key={label}>
-                <p
-                  className="text-4xl font-black mb-1"
-                  style={{
-                    background: "linear-gradient(135deg, #C9A646 0%, #E8C96A 100%)",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                    backgroundClip: "text",
-                    fontFamily: "Manrope, sans-serif",
-                  }}
-                >
-                  <Counter to={value} suffix={suffix} />
-                </p>
-                <p className="text-xs" style={{ color: "rgba(232,234,240,0.45)" }}>{label}</p>
-              </div>
-            ))}
-          </div>
-        </div>
+      {/* ─── DIVIDER ─── */}
+      <div style={{ maxWidth: 1080, margin: "0 auto", padding: "0 24px" }}>
+        <div style={{ height: 1, background: "rgba(17,24,39,0.06)" }} />
+      </div>
+
+      {/* ─── VALUE ─── */}
+      <section id="valor" style={{ maxWidth: 680, margin: "0 auto", padding: "120px 24px", textAlign: "center" }}>
+        <FadeIn>
+          <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "#C9A646", marginBottom: 24 }}>
+            Por que a NEXORA
+          </p>
+          <h2 style={{
+            fontSize: "clamp(1.8rem, 4vw, 2.8rem)",
+            fontWeight: 800, lineHeight: 1.15,
+            letterSpacing: "-0.025em",
+            color: "#111827",
+            margin: "0 auto 28px",
+          }}>
+            Você não precisa documentar depois.<br />
+            <span style={{ color: "#C9A646" }}>A consulta já sai pronta.</span>
+          </h2>
+          <p style={{ fontSize: 17, color: "#6B7280", lineHeight: 1.7, maxWidth: 480, margin: "0 auto" }}>
+            Enquanto você atende, a NEXORA transcreve, estrutura e organiza tudo em formato clínico — sem interromper seu raciocínio.
+          </p>
+        </FadeIn>
       </section>
 
-      {/* ─── FUNCIONALIDADES ─── */}
-      <section id="funcionalidades" className="py-24">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="mb-14">
-            <p className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: "#C9A646" }}>Funcionalidades</p>
-            <h2
-              className="font-black leading-tight"
-              style={{ fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)", letterSpacing: "-0.025em", color: "#E8EAF0", maxWidth: "560px", fontFamily: "Manrope, sans-serif" }}
-            >
-              Tudo que você precisa para uma consulta mais inteligente
-            </h2>
-          </div>
-
-          {/* Feature grid — asymmetric */}
-          <div className="grid md:grid-cols-3 gap-4">
-            {/* Large card */}
-            <div
-              className="md:col-span-2 rounded-2xl p-8 relative overflow-hidden"
-              style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}
-            >
-              <div
-                className="w-12 h-12 rounded-xl flex items-center justify-center mb-5"
-                style={{ background: "rgba(201,166,70,0.10)", border: "1px solid rgba(201,166,70,0.2)" }}
-              >
-                <Mic className="w-6 h-6" style={{ color: "#C9A646" }} />
-              </div>
-              <h3 className="text-xl font-bold mb-3" style={{ color: "#E8EAF0", fontFamily: "Manrope, sans-serif" }}>
-                Documente enquanto atende
-              </h3>
-              <p className="text-sm leading-relaxed" style={{ color: "rgba(232,234,240,0.55)", maxWidth: "380px" }}>
-                A consulta acontece e a documentação é feita automaticamente. Grave o atendimento, a Clari transcreve e estrutura tudo em formato SOAP — sem interromper seu raciocínio clínico.
-              </p>
-              {/* Decorative */}
-              <div
-                className="absolute bottom-0 right-0 w-40 h-40 pointer-events-none"
-                style={{ background: "radial-gradient(circle, rgba(201,166,70,0.08) 0%, transparent 70%)" }}
-              />
-            </div>
-
-            {/* Small card */}
-            <div
-              className="rounded-2xl p-6"
-              style={{ background: "rgba(201,166,70,0.06)", border: "1px solid rgba(201,166,70,0.15)" }}
-            >
-              <div
-                className="w-10 h-10 rounded-xl flex items-center justify-center mb-4"
-                style={{ background: "rgba(201,166,70,0.12)" }}
-              >
-                <Bot className="w-5 h-5" style={{ color: "#C9A646" }} />
-              </div>
-              <h3 className="text-base font-bold mb-2" style={{ color: "#E8EAF0", fontFamily: "Manrope, sans-serif" }}>
-                Clari — Assistente clínica
-              </h3>
-              <p className="text-sm leading-relaxed" style={{ color: "rgba(232,234,240,0.55)" }}>
-                Sugestões baseadas em evidências, hipóteses diagnósticas e apoio à decisão em tempo real.
-              </p>
-            </div>
-
-            {/* Small card */}
-            <div
-              className="rounded-2xl p-6"
-              style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}
-            >
-              <div
-                className="w-10 h-10 rounded-xl flex items-center justify-center mb-4"
-                style={{ background: "rgba(99,102,241,0.12)", border: "1px solid rgba(99,102,241,0.2)" }}
-              >
-                <FileText className="w-5 h-5" style={{ color: "#818CF8" }} />
-              </div>
-              <h3 className="text-base font-bold mb-2" style={{ color: "#E8EAF0", fontFamily: "Manrope, sans-serif" }}>
-                Documentos em segundos
-              </h3>
-              <p className="text-sm leading-relaxed" style={{ color: "rgba(232,234,240,0.55)" }}>
-                Evolução, prescrição, pedidos de exame e atestados gerados e exportados com um clique.
-              </p>
-            </div>
-
-            {/* Large card */}
-            <div
-              className="md:col-span-2 rounded-2xl p-8 relative overflow-hidden"
-              style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}
-            >
-              <div
-                className="w-12 h-12 rounded-xl flex items-center justify-center mb-5"
-                style={{ background: "rgba(99,102,241,0.10)", border: "1px solid rgba(99,102,241,0.2)" }}
-              >
-                <Stethoscope className="w-6 h-6" style={{ color: "#818CF8" }} />
-              </div>
-              <h3 className="text-xl font-bold mb-3" style={{ color: "#E8EAF0", fontFamily: "Manrope, sans-serif" }}>
-                Histórico clínico completo
-              </h3>
-              <p className="text-sm leading-relaxed" style={{ color: "rgba(232,234,240,0.55)", maxWidth: "380px" }}>
-                Todos os pacientes, consultas, exames e documentos organizados em um único lugar. Upload e análise de laudos anteriores com extração de contexto via IA.
-              </p>
-              <div
-                className="absolute bottom-0 right-0 w-40 h-40 pointer-events-none"
-                style={{ background: "radial-gradient(circle, rgba(99,102,241,0.07) 0%, transparent 70%)" }}
-              />
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* ─── DIVIDER ─── */}
+      <div style={{ maxWidth: 1080, margin: "0 auto", padding: "0 24px" }}>
+        <div style={{ height: 1, background: "rgba(17,24,39,0.06)" }} />
+      </div>
 
       {/* ─── CLARI ─── */}
-      <section id="clari" className="py-24" style={{ background: "rgba(255,255,255,0.015)" }}>
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            {/* Chat UI */}
-            <div className="relative order-2 lg:order-1">
-              <div
-                className="rounded-2xl overflow-hidden"
-                style={{
-                  background: "#0D1425",
-                  border: "1px solid rgba(201,166,70,0.15)",
-                  boxShadow: "0 24px 64px rgba(0,0,0,0.5)",
-                }}
-              >
-                {/* Header */}
-                <div
-                  className="flex items-center gap-3 px-5 py-4 border-b"
-                  style={{ borderColor: "rgba(255,255,255,0.06)" }}
-                >
-                  <div
-                    className="w-9 h-9 rounded-full flex items-center justify-center"
-                    style={{ background: "rgba(201,166,70,0.12)", border: "1px solid rgba(201,166,70,0.2)" }}
-                  >
-                    <Bot className="w-4 h-4" style={{ color: "#C9A646" }} />
-                  </div>
-                  <div>
-                    <p className="text-sm font-bold" style={{ color: "#E8EAF0" }}>Clari</p>
-                    <p className="text-[10px]" style={{ color: "rgba(232,234,240,0.40)" }}>Assistente clínica inteligente</p>
-                  </div>
-                  <div className="ml-auto flex items-center gap-1.5">
-                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    <span className="text-[10px]" style={{ color: "rgba(232,234,240,0.35)" }}>Online</span>
-                  </div>
-                </div>
-                {/* Messages */}
-                <div className="p-5 space-y-4">
-                  {[
-                    { from: "clari", text: "Analisei os dados do paciente. Identifiquei padrões compatíveis com esta hipótese diagnóstica. Deseja explorar condutas possíveis?" },
-                    { from: "user", text: "Sim, quais são as opções terapêuticas de primeira linha?" },
-                    { from: "clari", text: "Com base nas diretrizes atuais, as opções de primeira linha incluem..." },
-                  ].map((msg, i) => (
-                    <div key={i} className={`flex gap-3 ${msg.from === "user" ? "justify-end" : ""}`}>
-                      {msg.from === "clari" && (
-                        <div
-                          className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
-                          style={{ background: "rgba(201,166,70,0.12)" }}
-                        >
-                          <Bot className="w-3.5 h-3.5" style={{ color: "#C9A646" }} />
-                        </div>
-                      )}
-                      <div
-                        className="rounded-2xl px-4 py-3 max-w-xs text-sm leading-relaxed"
-                        style={{
-                          background: msg.from === "clari" ? "rgba(255,255,255,0.05)" : "rgba(201,166,70,0.12)",
-                          color: msg.from === "clari" ? "rgba(232,234,240,0.80)" : "#E8EAF0",
-                          borderRadius: msg.from === "clari" ? "4px 16px 16px 16px" : "16px 4px 16px 16px",
-                        }}
-                      >
-                        {msg.text}
-                        {i === 2 && (
-                          <div className="mt-2 flex gap-2">
-                            <span
-                              className="text-[10px] px-2 py-1 rounded-full font-semibold"
-                              style={{ background: "rgba(201,166,70,0.15)", color: "#C9A646" }}
-                            >Ver evidências</span>
-                            <span
-                              className="text-[10px] px-2 py-1 rounded-full font-semibold"
-                              style={{ background: "rgba(255,255,255,0.06)", color: "rgba(232,234,240,0.50)" }}
-                            >Gerar prescrição</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                {/* Disclaimer */}
-                <div
-                  className="px-5 pb-4 pt-2 border-t text-center"
-                  style={{ borderColor: "rgba(255,255,255,0.05)" }}
-                >
-                  <p className="text-[10px]" style={{ color: "rgba(232,234,240,0.30)" }}>
-                    ⚠️ Clari é suporte clínico. A decisão médica é sempre do profissional.
-                  </p>
-                </div>
-              </div>
-              <div
-                className="absolute -inset-6 -z-10 pointer-events-none"
-                style={{ background: "radial-gradient(ellipse, rgba(201,166,70,0.06) 0%, transparent 70%)" }}
-              />
-            </div>
-
-            {/* Text */}
-            <div className="order-1 lg:order-2">
-              <div
-                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold mb-6 tracking-widest uppercase"
-                style={{ background: "rgba(201,166,70,0.08)", border: "1px solid rgba(201,166,70,0.2)", color: "#C9A646" }}
-              >
-                <Bot className="w-3.5 h-3.5" />
-                Assistente clínica
-              </div>
-              <h2
-                className="font-black leading-tight mb-4"
-                style={{ fontSize: "clamp(1.8rem, 3vw, 2.5rem)", letterSpacing: "-0.025em", color: "#E8EAF0", fontFamily: "Manrope, sans-serif" }}
-              >
-                Conheça a Clari, sua assistente clínica inteligente
-              </h2>
-              <p className="text-base leading-relaxed mb-7" style={{ color: "rgba(232,234,240,0.55)" }}>
-                Durante a consulta, a Clari organiza informações, sugere hipóteses e apoia sua tomada de decisão — sempre baseada em evidências, sempre respeitando sua autonomia.
-              </p>
-              <ul className="space-y-3 mb-8">
-                {[
-                  "Organiza automaticamente as informações do atendimento",
-                  "Estrutura sua evolução em formato clínico SOAP",
-                  "Sugere hipóteses e caminhos baseados em evidência",
-                  "Apoia sua decisão sem substituir seu julgamento",
-                ].map((item) => (
-                  <li key={item} className="flex items-start gap-3 text-sm" style={{ color: "rgba(232,234,240,0.70)" }}>
-                    <CheckCircle2 className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: "#C9A646" }} />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-              <a
-                href={getLoginUrl()}
-                className="inline-flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-bold transition-all duration-150"
-                style={{ background: "#C9A646", color: "#0A0F1E" }}
-                onMouseEnter={e => (e.currentTarget.style.opacity = "0.88")}
-                onMouseLeave={e => (e.currentTarget.style.opacity = "1")}
-              >
-                Experimentar a Clari
-                <ArrowRight className="w-4 h-4" />
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ─── COMO FUNCIONA ─── */}
-      <section className="py-24">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center mb-14">
-            <p className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: "#C9A646" }}>Processo</p>
-            <h2
-              className="font-black"
-              style={{ fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)", letterSpacing: "-0.025em", color: "#E8EAF0", fontFamily: "Manrope, sans-serif" }}
-            >
-              Como funciona
+      <section id="clari" style={{ maxWidth: 1080, margin: "0 auto", padding: "120px 24px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 80, alignItems: "center" }}>
+          {/* Text */}
+          <FadeIn>
+            <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "#C9A646", marginBottom: 20 }}>
+              Clari
+            </p>
+            <h2 style={{
+              fontSize: "clamp(1.6rem, 3vw, 2.4rem)",
+              fontWeight: 800, lineHeight: 1.15,
+              letterSpacing: "-0.025em",
+              color: "#111827",
+              marginBottom: 20,
+            }}>
+              Uma assistente que acompanha sua consulta
             </h2>
-          </div>
-          <div className="relative">
-            {/* Connecting line */}
-            <div
-              className="absolute top-8 left-0 right-0 h-px hidden lg:block"
-              style={{ background: "linear-gradient(90deg, transparent, rgba(201,166,70,0.2), rgba(201,166,70,0.2), transparent)" }}
-            />
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <p style={{ fontSize: 16, color: "#6B7280", lineHeight: 1.7, marginBottom: 32 }}>
+              A Clari organiza, estrutura e sugere — sem interromper.
+            </p>
+            <ul style={{ listStyle: "none", padding: 0, margin: "0 0 36px", display: "flex", flexDirection: "column", gap: 12 }}>
               {[
-                { step: "01", title: "Inicie a consulta", desc: "A NEXORA acompanha o atendimento em tempo real", icon: Stethoscope },
-                { step: "02", title: "Clari organiza tudo", desc: "Transcrição, estrutura clínica e dados organizados automaticamente", icon: Bot },
-                { step: "03", title: "Suporte inteligente", desc: "Sugestões clínicas claras, baseadas em evidência", icon: Sparkles },
-                { step: "04", title: "Finalize pronto", desc: "Documentação completa, organizada e exportável", icon: FileText },
-              ].map(({ step, title, desc, icon: Icon }) => (
-                <div key={step} className="relative text-center">
-                  <div
-                    className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5 relative z-10"
-                    style={{
-                      background: "#0A0F1E",
-                      border: "1px solid rgba(201,166,70,0.25)",
-                      boxShadow: "0 0 0 4px rgba(10,15,30,1)",
-                    }}
-                  >
-                    <Icon className="w-7 h-7" style={{ color: "#C9A646" }} />
-                  </div>
-                  <p className="text-xs font-black tracking-widest mb-2" style={{ color: "rgba(201,166,70,0.40)" }}>{step}</p>
-                  <h3 className="text-base font-bold mb-2" style={{ color: "#E8EAF0", fontFamily: "Manrope, sans-serif" }}>{title}</h3>
-                  <p className="text-sm leading-relaxed" style={{ color: "rgba(232,234,240,0.45)" }}>{desc}</p>
-                </div>
+                "Transcrição em tempo real durante a consulta",
+                "Estrutura SOAP gerada automaticamente",
+                "Sugestões baseadas em evidências clínicas",
+              ].map(item => (
+                <li key={item} style={{ display: "flex", alignItems: "flex-start", gap: 10, fontSize: 15, color: "#374151" }}>
+                  <CheckCircle2 size={17} color="#C9A646" style={{ marginTop: 2, flexShrink: 0 }} />
+                  {item}
+                </li>
               ))}
+            </ul>
+            <a
+              href={getLoginUrl()}
+              style={{
+                display: "inline-flex", alignItems: "center", gap: 7,
+                fontSize: 14, fontWeight: 600, color: "#111827",
+                textDecoration: "none",
+              }}
+              onMouseEnter={e => (e.currentTarget.style.color = "#C9A646")}
+              onMouseLeave={e => (e.currentTarget.style.color = "#111827")}
+            >
+              Conhecer a Clari <ArrowRight size={15} />
+            </a>
+          </FadeIn>
+
+          {/* Chat UI */}
+          <FadeIn delay={80}>
+            <div style={{
+              background: "#fff",
+              borderRadius: 16,
+              border: "1px solid rgba(17,24,39,0.08)",
+              boxShadow: "0 8px 40px rgba(17,24,39,0.07)",
+              overflow: "hidden",
+            }}>
+              {/* Header */}
+              <div style={{
+                padding: "16px 20px",
+                borderBottom: "1px solid rgba(17,24,39,0.06)",
+                display: "flex", alignItems: "center", gap: 10,
+              }}>
+                <div style={{
+                  width: 32, height: 32, borderRadius: "50%",
+                  background: "rgba(201,166,70,0.10)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                }}>
+                  <Bot size={15} color="#C9A646" />
+                </div>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "#111827" }}>Clari</div>
+                  <div style={{ fontSize: 11, color: "#9CA3AF" }}>Assistente clínica</div>
+                </div>
+                <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 5 }}>
+                  <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#22C55E" }} />
+                  <span style={{ fontSize: 11, color: "#9CA3AF" }}>Online</span>
+                </div>
+              </div>
+
+              {/* Messages */}
+              <div style={{ padding: "20px", display: "flex", flexDirection: "column", gap: 14 }}>
+                {/* Clari message */}
+                <div style={{ display: "flex", gap: 10 }}>
+                  <div style={{
+                    width: 28, height: 28, borderRadius: "50%", flexShrink: 0,
+                    background: "rgba(201,166,70,0.08)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                  }}>
+                    <Bot size={13} color="#C9A646" />
+                  </div>
+                  <div style={{
+                    background: "#F9FAFB", borderRadius: "4px 14px 14px 14px",
+                    padding: "10px 14px", fontSize: 13, color: "#374151", lineHeight: 1.55,
+                    maxWidth: "85%",
+                  }}>
+                    Identifiquei padrões compatíveis com esta hipótese. Deseja explorar as condutas possíveis?
+                  </div>
+                </div>
+
+                {/* User message */}
+                <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                  <div style={{
+                    background: "#111827", borderRadius: "14px 4px 14px 14px",
+                    padding: "10px 14px", fontSize: 13, color: "#fff", lineHeight: 1.55,
+                    maxWidth: "80%",
+                  }}>
+                    Sim, quais são as opções de primeira linha?
+                  </div>
+                </div>
+
+                {/* Clari response */}
+                <div style={{ display: "flex", gap: 10 }}>
+                  <div style={{
+                    width: 28, height: 28, borderRadius: "50%", flexShrink: 0,
+                    background: "rgba(201,166,70,0.08)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                  }}>
+                    <Bot size={13} color="#C9A646" />
+                  </div>
+                  <div style={{
+                    background: "#F9FAFB", borderRadius: "4px 14px 14px 14px",
+                    padding: "10px 14px", fontSize: 13, color: "#374151", lineHeight: 1.55,
+                    maxWidth: "85%",
+                  }}>
+                    Com base nas diretrizes atuais, as opções de primeira linha incluem...
+                    <div style={{ display: "flex", gap: 6, marginTop: 10 }}>
+                      {["Ver evidências", "Gerar prescrição"].map(label => (
+                        <span key={label} style={{
+                          fontSize: 11, fontWeight: 600,
+                          padding: "4px 10px", borderRadius: 20,
+                          background: label === "Ver evidências" ? "rgba(201,166,70,0.10)" : "#F3F4F6",
+                          color: label === "Ver evidências" ? "#C9A646" : "#6B7280",
+                          cursor: "pointer",
+                        }}>{label}</span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Disclaimer */}
+              <div style={{
+                padding: "10px 20px 14px",
+                borderTop: "1px solid rgba(17,24,39,0.05)",
+                textAlign: "center",
+              }}>
+                <p style={{ fontSize: 10, color: "#D1D5DB", margin: 0 }}>
+                  Clari é suporte clínico. A decisão médica é sempre do profissional.
+                </p>
+              </div>
             </div>
-          </div>
+          </FadeIn>
         </div>
       </section>
 
-      {/* ─── SEGURANÇA ─── */}
-      <section id="segurança" className="py-20" style={{ background: "rgba(255,255,255,0.015)", borderTop: "1px solid rgba(255,255,255,0.05)", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <p className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: "#C9A646" }}>Segurança</p>
-              <h2
-                className="font-black leading-tight mb-4"
-                style={{ fontSize: "clamp(1.8rem, 3vw, 2.5rem)", letterSpacing: "-0.025em", color: "#E8EAF0", fontFamily: "Manrope, sans-serif" }}
-              >
-                Sua prática clínica protegida por padrão
-              </h2>
-              <p className="text-base leading-relaxed" style={{ color: "rgba(232,234,240,0.55)" }}>
-                A NEXORA foi construída com conformidade LGPD desde o início. O áudio das consultas é descartado automaticamente após o processamento — nunca armazenado.
-              </p>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              {[
-                { icon: Shield, title: "Conformidade LGPD", desc: "Áudio descartado após processamento" },
-                { icon: Lock, title: "Dados criptografados", desc: "Segurança de ponta a ponta" },
-                { icon: CheckCircle2, title: "Controle de acesso", desc: "Perfis por papel e responsabilidade" },
-                { icon: Zap, title: "Autonomia médica", desc: "A decisão clínica é sempre sua" },
-              ].map(({ icon: Icon, title, desc }) => (
-                <div
-                  key={title}
-                  className="rounded-xl p-4"
-                  style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}
-                >
-                  <div
-                    className="w-9 h-9 rounded-lg flex items-center justify-center mb-3"
-                    style={{ background: "rgba(201,166,70,0.08)" }}
-                  >
-                    <Icon className="w-4.5 h-4.5" style={{ color: "#C9A646" }} />
-                  </div>
-                  <p className="text-sm font-bold mb-1" style={{ color: "#E8EAF0" }}>{title}</p>
-                  <p className="text-xs leading-relaxed" style={{ color: "rgba(232,234,240,0.40)" }}>{desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* ─── DIVIDER ─── */}
+      <div style={{ maxWidth: 1080, margin: "0 auto", padding: "0 24px" }}>
+        <div style={{ height: 1, background: "rgba(17,24,39,0.06)" }} />
+      </div>
 
-      {/* ─── CTA FINAL ─── */}
-      <section className="py-28 relative overflow-hidden">
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{ background: "radial-gradient(ellipse 80% 60% at 50% 50%, rgba(201,166,70,0.07) 0%, transparent 70%)" }}
-        />
-        <div className="max-w-3xl mx-auto px-6 text-center relative">
-          <div
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold mb-6 tracking-widest uppercase"
-            style={{ background: "rgba(201,166,70,0.08)", border: "1px solid rgba(201,166,70,0.2)", color: "#C9A646" }}
-          >
-            <Sparkles className="w-3 h-3" />
-            Comece hoje
-          </div>
-          <h2
-            className="font-black leading-tight mb-5"
-            style={{ fontSize: "clamp(2rem, 4vw, 3.2rem)", letterSpacing: "-0.03em", color: "#E8EAF0", fontFamily: "Manrope, sans-serif" }}
-          >
-            Pronto para elevar sua prática clínica?
+      {/* ─── FINAL CTA ─── */}
+      <section style={{ maxWidth: 680, margin: "0 auto", padding: "120px 24px 140px", textAlign: "center" }}>
+        <FadeIn>
+          <h2 style={{
+            fontSize: "clamp(1.8rem, 4vw, 2.8rem)",
+            fontWeight: 800, lineHeight: 1.12,
+            letterSpacing: "-0.025em",
+            color: "#111827",
+            marginBottom: 20,
+          }}>
+            Pronto para atender com mais clareza?
           </h2>
-          <p className="text-lg leading-relaxed mb-8" style={{ color: "rgba(232,234,240,0.50)", maxWidth: "520px", margin: "0 auto 2rem" }}>
-            Comece agora e experimente uma nova forma de atender — com mais clareza, menos carga operacional e maior precisão na decisão.
+          <p style={{ fontSize: 17, color: "#6B7280", lineHeight: 1.65, marginBottom: 40, maxWidth: 420, margin: "0 auto 40px" }}>
+            Comece agora e veja sua consulta se transformar em documentação clínica completa — automaticamente.
           </p>
           <a
             href={getLoginUrl()}
-            className="inline-flex items-center gap-2 px-8 py-4 rounded-xl text-base font-black transition-all duration-200"
-            style={{ background: "#C9A646", color: "#0A0F1E", boxShadow: "0 4px 32px rgba(201,166,70,0.30)" }}
-            onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 8px 40px rgba(201,166,70,0.40)"; }}
-            onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 4px 32px rgba(201,166,70,0.30)"; }}
+            style={{
+              display: "inline-flex", alignItems: "center", gap: 8,
+              padding: "14px 32px", borderRadius: 10,
+              background: "#111827", color: "#fff",
+              fontSize: 15, fontWeight: 600, textDecoration: "none",
+              boxShadow: "0 2px 8px rgba(17,24,39,0.18)",
+              transition: "all 0.15s",
+            }}
+            onMouseEnter={e => { e.currentTarget.style.background = "#1f2937"; e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 6px 20px rgba(17,24,39,0.22)"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "#111827"; e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 2px 8px rgba(17,24,39,0.18)"; }}
           >
-            Começar gratuitamente
-            <ArrowRight className="w-4 h-4" />
+            Começar agora
+            <ArrowRight size={16} />
           </a>
-        </div>
+        </FadeIn>
       </section>
 
       {/* ─── FOOTER ─── */}
-      <footer style={{ borderTop: "1px solid rgba(255,255,255,0.06)", background: "#070B16" }}>
-        <div className="max-w-6xl mx-auto px-6 py-10 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2.5">
-            <div
-              className="w-7 h-7 rounded-lg flex items-center justify-center"
-              style={{ background: "rgba(201,166,70,0.10)", border: "1px solid rgba(201,166,70,0.2)" }}
-            >
-              <Activity className="w-3.5 h-3.5" style={{ color: "#C9A646" }} />
-            </div>
-            <span className="text-sm font-black tracking-widest uppercase" style={{ color: "#E8EAF0", letterSpacing: "0.15em" }}>NEXORA</span>
-          </div>
-          <p className="text-xs text-center" style={{ color: "rgba(232,234,240,0.30)" }}>
-            Clari é uma ferramenta de suporte clínico. A decisão médica final é sempre do profissional de saúde.
+      <footer style={{
+        borderTop: "1px solid rgba(17,24,39,0.06)",
+        background: "#F9FAFB",
+      }}>
+        <div style={{
+          maxWidth: 1080, margin: "0 auto", padding: "28px 24px",
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          flexWrap: "wrap", gap: 12,
+        }}>
+          <span style={{ fontSize: 13, fontWeight: 800, letterSpacing: "0.12em", color: "#111827" }}>NEXORA</span>
+          <p style={{ fontSize: 11, color: "#D1D5DB", textAlign: "center", margin: 0 }}>
+            Clari é suporte clínico. A decisão médica é sempre do profissional de saúde.
           </p>
-          <p className="text-xs" style={{ color: "rgba(232,234,240,0.25)" }}>
-            © {new Date().getFullYear()} NEXORA
-          </p>
+          <p style={{ fontSize: 11, color: "#D1D5DB", margin: 0 }}>© {new Date().getFullYear()}</p>
         </div>
       </footer>
+
     </div>
   );
 }
