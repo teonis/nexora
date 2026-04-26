@@ -16,7 +16,7 @@ import {
   X,
   Zap,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 
@@ -40,6 +40,14 @@ export default function ClinicalLayout({ children, title, subtitle, actions }: C
   const [location] = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { theme, toggleTheme, switchable } = useTheme();
+  const [authTimeout, setAuthTimeout] = useState(false);
+
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      const timer = setTimeout(() => setAuthTimeout(true), 400);
+      return () => clearTimeout(timer);
+    }
+  }, [loading, isAuthenticated]);
 
   const initials = user?.name
     ? user.name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase()
@@ -56,9 +64,55 @@ export default function ClinicalLayout({ children, title, subtitle, actions }: C
     );
   }
 
-  if (!isAuthenticated) {
-    window.location.href = getLoginUrl();
-    return null;
+  if (!loading && !isAuthenticated) {
+    if (!authTimeout) return null;
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-6">
+        <div className="max-w-sm w-full text-center">
+          {/* Icon */}
+          <div className="w-16 h-16 rounded-2xl bg-destructive/8 flex items-center justify-center mx-auto mb-6">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="text-destructive">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+          </div>
+
+          {/* Heading */}
+          <h1 className="text-xl font-bold text-foreground mb-2 tracking-tight">Acesso não autorizado</h1>
+          <p className="text-sm text-muted-foreground leading-relaxed mb-8">
+            Sua sessão expirou ou você não tem permissão para acessar esta página.
+            Faça login para continuar.
+          </p>
+
+          {/* Actions */}
+          <div className="flex flex-col gap-3">
+            <a
+              href={getLoginUrl()}
+              className="inline-flex items-center justify-center gap-2 w-full h-10 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity"
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                <polyline points="10 17 15 12 10 7" />
+                <line x1="15" y1="12" x2="3" y2="12" />
+              </svg>
+              Fazer login
+            </a>
+            <a
+              href="/"
+              className="inline-flex items-center justify-center w-full h-10 rounded-lg border border-border text-sm text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-all"
+            >
+              Voltar para a página inicial
+            </a>
+          </div>
+
+          {/* Footer note */}
+          <p className="text-xs text-muted-foreground/60 mt-8">
+            NEXORA · Plataforma Clínica com IA
+          </p>
+        </div>
+      </div>
+    );
   }
 
   return (
