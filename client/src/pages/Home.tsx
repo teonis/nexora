@@ -29,6 +29,85 @@ function FadeIn({ children, delay = 0 }: { children: React.ReactNode; delay?: nu
   return <div ref={ref}>{children}</div>;
 }
 
+/* ─── Especialidades ─── */
+const SPECIALTIES = [
+  {
+    id: "cardio",
+    label: "Cardiologia",
+    emoji: "🫀",
+    patient: "João M., 52 anos",
+    recording: '"...paciente refere dor torácica há 3 dias, piora ao esforço, sem irradiação..."',
+    soap: [
+      { tag: "S", text: "Dor torácica há 3 dias, piora ao esforço, sem irradiação" },
+      { tag: "O", text: "PA 130/85 mmHg, FC 88 bpm, ausculta cardíaca normal" },
+      { tag: "A", text: "Suspeita de angina estável — CID I20.8" },
+      { tag: "P", text: "ECG + troponina + encaminhamento cardiologista" },
+    ],
+    clari: "Identifiquei padrões compatíveis com angina estável. Deseja explorar as condutas de primeira linha?",
+    actions: ["Ver evidências", "Gerar encaminhamento"],
+  },
+  {
+    id: "nutro",
+    label: "Nutrologia",
+    emoji: "🌿",
+    patient: "Ana P., 34 anos",
+    recording: '"...paciente relata ganho de 8kg em 6 meses, fadiga constante, hábitos alimentares irregulares..."',
+    soap: [
+      { tag: "S", text: "Ganho ponderal de 8kg em 6 meses, fadiga e compulsão alimentar" },
+      { tag: "O", text: "IMC 28,4 kg/m², circunferência abdominal 88cm" },
+      { tag: "A", text: "Sobrepeso com risco metabólico — CID E66.0" },
+      { tag: "P", text: "Plano alimentar + exames metabólicos + retorno em 30 dias" },
+    ],
+    clari: "Identifiquei padrão compatível com sobrepeso de origem multifatorial. Deseja gerar plano alimentar personalizado?",
+    actions: ["Gerar plano", "Solicitar exames"],
+  },
+  {
+    id: "dermato",
+    label: "Dermatologia",
+    emoji: "✨",
+    patient: "Carla S., 28 anos",
+    recording: '"...lesões acênéicas no rosto há 2 meses, piora com estresse, sem uso de medicamentos..."',
+    soap: [
+      { tag: "S", text: "Lesões acênéicas faciais há 2 meses, piora ao estresse" },
+      { tag: "O", text: "Acêné grau II, predominância em região malar bilateral" },
+      { tag: "A", text: "Acêné vulgar moderada — CID L70.0" },
+      { tag: "P", text: "Adapaleno 0,1% + antibioticoterapia tópica + protetor solar" },
+    ],
+    clari: "Padrão compatível com acêné vulgar moderada. Deseja ver protocolo de tratamento baseado em evidências?",
+    actions: ["Ver protocolo", "Gerar prescrição"],
+  },
+  {
+    id: "endo",
+    label: "Endocrinologia",
+    emoji: "🧬",
+    patient: "Roberto L., 47 anos",
+    recording: '"...paciente diabético tipo 2 há 5 anos, glicemia em jejum 210 mg/dL, poliuria e polidipsia..."',
+    soap: [
+      { tag: "S", text: "Poliuria, polidipsia e glicemia 210 mg/dL em jejum" },
+      { tag: "O", text: "HbA1c 9,2%, peso 94kg, PA 138/88 mmHg" },
+      { tag: "A", text: "DM2 descompensado com síndrome metabólica — CID E11" },
+      { tag: "P", text: "Ajuste de metformina + inibidor SGLT2 + retorno em 15 dias" },
+    ],
+    clari: "HbA1c 9,2% indica descompensação significativa. Deseja avaliar escalonamento terapêutico baseado nas diretrizes ADA 2024?",
+    actions: ["Ver diretrizes", "Ajustar dose"],
+  },
+  {
+    id: "gineco",
+    label: "Ginecologia",
+    emoji: "🌸",
+    patient: "Mariana T., 31 anos",
+    recording: '"...ciclos irregulares há 4 meses, dor pélvica crônica, ultrassom com imagem cística ovariana..."',
+    soap: [
+      { tag: "S", text: "Ciclos irregulares há 4 meses e dor pélvica crônica" },
+      { tag: "O", text: "Ultrassom: cisto ovariano direito 4,2cm, CA-125 normal" },
+      { tag: "A", text: "Suspeita de endometrioma — CID N80.1" },
+      { tag: "P", text: "Progesterona + controle ultrassonográfico em 60 dias" },
+    ],
+    clari: "Cisto ovariano com características de endometrioma. Deseja explorar critérios para conduta expectante vs. cirúrgica?",
+    actions: ["Ver critérios", "Gerar pedido"],
+  },
+];
+
 /* ─── Animated Mockup ─── */
 const STEPS = [
   {
@@ -152,12 +231,26 @@ const STEPS = [
 function AnimatedMockup() {
   const [step, setStep] = useState(0);
   const [visible, setVisible] = useState(true);
+  const [specIdx, setSpecIdx] = useState(0);
+  const [specVisible, setSpecVisible] = useState(true);
 
+  // Auto-advance steps
   useEffect(() => {
     const timer = setInterval(() => {
       setVisible(false);
       setTimeout(() => {
-        setStep(s => (s + 1) % STEPS.length);
+        setStep(s => {
+          const next = (s + 1) % STEPS.length;
+          // When wrapping back to 0, also advance specialty
+          if (next === 0) {
+            setSpecVisible(false);
+            setTimeout(() => {
+              setSpecIdx(si => (si + 1) % SPECIALTIES.length);
+              setSpecVisible(true);
+            }, 300);
+          }
+          return next;
+        });
         setVisible(true);
       }, 350);
     }, 3200);
@@ -166,6 +259,100 @@ function AnimatedMockup() {
 
   const current = STEPS[step];
   const Icon = current.icon;
+  const spec = SPECIALTIES[specIdx];
+
+  function changeSpec(i: number) {
+    if (i === specIdx) return;
+    setSpecVisible(false);
+    setVisible(false);
+    setTimeout(() => {
+      setSpecIdx(i);
+      setStep(0);
+      setSpecVisible(true);
+      setVisible(true);
+    }, 280);
+  }
+
+  // Build SOAP content for current specialty
+  const soapContent = (
+    <div>
+      <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
+        <CheckCircle2 size={13} color="#10B981" />
+        <span style={{ fontSize: 11, fontWeight: 600, color: "#10B981" }}>SOAP gerado automaticamente</span>
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+        {spec.soap.map(({ tag, text }) => (
+          <div key={tag} style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
+            <span style={{
+              fontSize: 10, fontWeight: 800, color: "#C9A646",
+              background: "rgba(201,166,70,0.10)",
+              padding: "2px 6px", borderRadius: 4, flexShrink: 0, marginTop: 1,
+            }}>{tag}</span>
+            <span style={{ fontSize: 11, color: "#374151", lineHeight: 1.5 }}>{text}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  const clariContent = (
+    <div>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+        <div style={{ width: 24, height: 24, borderRadius: "50%", background: "rgba(201,166,70,0.12)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <Bot size={12} color="#C9A646" />
+        </div>
+        <span style={{ fontSize: 11, fontWeight: 700, color: "#C9A646" }}>Clari</span>
+        <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#22C55E", marginLeft: "auto" }} />
+      </div>
+      <p style={{ fontSize: 11, color: "#374151", lineHeight: 1.6, margin: "0 0 10px" }}>{spec.clari}</p>
+      <div style={{ display: "flex", gap: 6 }}>
+        {spec.actions.map((label, li) => (
+          <span key={label} style={{
+            fontSize: 10, fontWeight: 600, padding: "4px 10px", borderRadius: 20,
+            background: li === 0 ? "rgba(201,166,70,0.12)" : "#F3F4F6",
+            color: li === 0 ? "#C9A646" : "#6B7280",
+            cursor: "pointer",
+          }}>{label}</span>
+        ))}
+      </div>
+    </div>
+  );
+
+  const recordingContent = (
+    <div>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+        <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#EF4444", animation: "pulse 1.2s infinite" }} />
+        <span style={{ fontSize: 11, fontWeight: 600, color: "#EF4444" }}>Gravando</span>
+        <span style={{ fontSize: 11, color: "#9CA3AF", marginLeft: "auto" }}>00:02:14</span>
+      </div>
+      <div style={{ background: "#fff", borderRadius: 8, padding: "10px 12px", border: "1px solid rgba(17,24,39,0.06)" }}>
+        <p style={{ fontSize: 11, color: "#374151", lineHeight: 1.6, margin: 0 }}>{spec.recording}</p>
+      </div>
+      <div style={{ display: "flex", gap: 4, marginTop: 8, alignItems: "center" }}>
+        {[14,8,18,6,22,10,16,5,20,12,18,7,24,9,15,6,19,11,17,8].map((h, i) => (
+          <div key={i} style={{ width: 3, borderRadius: 2, background: "#C9A646", height: h, opacity: 0.5 + (i % 3) * 0.2 }} />
+        ))}
+      </div>
+    </div>
+  );
+
+  const transcribingContent = (
+    <div>
+      <div style={{ fontSize: 11, fontWeight: 600, color: "#C9A646", marginBottom: 10 }}>Transcrição em andamento...</div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+        {spec.soap.map((line, i) => (
+          <div key={i} style={{
+            fontSize: 11, color: i < 2 ? "#374151" : "#9CA3AF",
+            padding: "6px 10px", borderRadius: 6,
+            background: i < 2 ? "#fff" : "transparent",
+            border: i < 2 ? "1px solid rgba(17,24,39,0.06)" : "none",
+          }}>{line.tag} — {line.text}</div>
+        ))}
+      </div>
+    </div>
+  );
+
+  const stepContents = [recordingContent, transcribingContent, soapContent, clariContent];
 
   return (
     <div style={{ marginTop: 72, position: "relative" }}>
@@ -200,11 +387,43 @@ function AnimatedMockup() {
           <div style={{ flex: 1, background: "#E5E7EB", borderRadius: 6, height: 20, marginLeft: 8 }} />
         </div>
 
+        {/* Specialty tabs */}
+        <div style={{
+          borderBottom: "1px solid rgba(17,24,39,0.07)",
+          padding: "0 20px",
+          display: "flex", gap: 0, overflowX: "auto",
+          background: "#FAFAFA",
+        }}>
+          {SPECIALTIES.map((sp, i) => (
+            <button
+              key={sp.id}
+              onClick={() => changeSpec(i)}
+              style={{
+                fontSize: 11, fontWeight: i === specIdx ? 600 : 400,
+                padding: "10px 14px",
+                color: i === specIdx ? "#111827" : "#9CA3AF",
+                background: "none", border: "none", cursor: "pointer",
+                borderBottom: i === specIdx ? "2px solid #C9A646" : "2px solid transparent",
+                whiteSpace: "nowrap",
+                fontFamily: "inherit",
+                transition: "all 0.2s",
+              }}
+            >
+              {sp.emoji} {sp.label}
+            </button>
+          ))}
+        </div>
+
         {/* Dashboard layout */}
-        <div style={{ padding: "24px 24px 20px", display: "grid", gridTemplateColumns: "160px 1fr", gap: 20 }}>
+        <div style={{
+          padding: "20px 20px 18px",
+          display: "grid", gridTemplateColumns: "150px 1fr", gap: 18,
+          opacity: specVisible ? 1 : 0,
+          transition: "opacity 0.28s ease",
+        }}>
           {/* Sidebar */}
-          <div style={{ borderRight: "1px solid #F3F4F6", paddingRight: 16 }}>
-            <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.12em", color: "#111827", marginBottom: 16 }}>NEXORA</div>
+          <div style={{ borderRight: "1px solid #F3F4F6", paddingRight: 14 }}>
+            <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.12em", color: "#111827", marginBottom: 14 }}>NEXORA</div>
             {STEPS.map((s, i) => {
               const SIcon = s.icon;
               const active = i === step;
@@ -213,7 +432,7 @@ function AnimatedMockup() {
                   key={s.id}
                   onClick={() => { setVisible(false); setTimeout(() => { setStep(i); setVisible(true); }, 200); }}
                   style={{
-                    fontSize: 11, padding: "7px 10px", borderRadius: 7, marginBottom: 3,
+                    fontSize: 11, padding: "6px 9px", borderRadius: 7, marginBottom: 3,
                     background: active ? "#F9FAFB" : "transparent",
                     color: active ? "#111827" : "#9CA3AF",
                     fontWeight: active ? 600 : 400,
@@ -232,24 +451,24 @@ function AnimatedMockup() {
 
           {/* Main panel */}
           <div>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
               <div style={{
-                width: 28, height: 28, borderRadius: 8,
+                width: 26, height: 26, borderRadius: 8,
                 background: current.bg,
                 display: "flex", alignItems: "center", justifyContent: "center",
                 transition: "background 0.3s",
               }}>
-                <Icon size={14} color={current.color} />
+                <Icon size={13} color={current.color} />
               </div>
               <div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: "#111827" }}>Consulta em andamento</div>
-                <div style={{ fontSize: 10, color: "#9CA3AF" }}>Dr. Silva · Paciente: João M., 52 anos</div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "#111827" }}>Consulta em andamento</div>
+                <div style={{ fontSize: 10, color: "#9CA3AF" }}>Dr. Silva · Paciente: {spec.patient}</div>
               </div>
               {/* Step indicators */}
               <div style={{ marginLeft: "auto", display: "flex", gap: 5 }}>
                 {STEPS.map((_, i) => (
                   <div key={i} style={{
-                    width: i === step ? 16 : 6, height: 6, borderRadius: 3,
+                    width: i === step ? 14 : 5, height: 5, borderRadius: 3,
                     background: i === step ? current.color : "#E5E7EB",
                     transition: "all 0.3s",
                     cursor: "pointer",
@@ -264,14 +483,14 @@ function AnimatedMockup() {
             <div style={{
               background: "#F9FAFB",
               borderRadius: 12,
-              padding: "16px",
+              padding: "14px",
               border: "1px solid rgba(17,24,39,0.06)",
-              minHeight: 140,
+              minHeight: 130,
               opacity: visible ? 1 : 0,
               transform: visible ? "translateY(0)" : "translateY(6px)",
               transition: "opacity 0.35s ease, transform 0.35s ease",
             }}>
-              {current.content}
+              {stepContents[step]}
             </div>
           </div>
         </div>
