@@ -228,7 +228,7 @@ const STEPS = [
   },
 ];
 
-function AnimatedMockup() {
+function AnimatedMockup({ isAuthenticated, loginUrl }: { isAuthenticated: boolean; loginUrl: string }) {
   const [step, setStep] = useState(0);
   const [visible, setVisible] = useState(true);
   const [specIdx, setSpecIdx] = useState(0);
@@ -562,6 +562,30 @@ function AnimatedMockup() {
               transition: "opacity 0.35s ease, transform 0.35s ease",
             }}>
               {stepContents[step]}
+            </div>
+            {/* CTA Testar agora */}
+            <div style={{ marginTop: 16, display: "flex", justifyContent: "flex-end" }}>
+              <a
+                href={isAuthenticated ? "/dashboard" : loginUrl}
+                style={{
+                  display: "inline-flex", alignItems: "center", gap: 6,
+                  fontSize: 12, fontWeight: 600,
+                  color: "#fff",
+                  background: "#111827",
+                  border: "none",
+                  borderRadius: 8,
+                  padding: "8px 16px",
+                  textDecoration: "none",
+                  cursor: "pointer",
+                  transition: "background 0.18s, transform 0.15s",
+                  boxShadow: "0 2px 8px rgba(17,24,39,0.15)",
+                }}
+                onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.background = "#C9A646"; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.background = "#111827"; }}
+              >
+                Testar agora
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              </a>
             </div>
           </div>
         </div>
@@ -1043,7 +1067,7 @@ export default function Home() {
 
         {/* ─── Animated Product Mockup ─── */}
         <FadeIn delay={120}>
-          <AnimatedMockup />
+          <AnimatedMockup isAuthenticated={isAuthenticated} loginUrl={getLoginUrl()} />
         </FadeIn>
       </section>
 
