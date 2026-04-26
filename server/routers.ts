@@ -550,7 +550,31 @@ const dashboardRouter = router({
   }),
 });
 
-// ─── App Router ───────────────────────────────────────────────────────────────
+// ─── Contact Router ───────────────────────────────────────────────────────────────────────────────
+const contactRouter = router({
+  send: publicProcedure
+    .input(z.object({
+      name: z.string().min(2),
+      email: z.string().email(),
+      subject: z.string().min(1),
+      message: z.string().min(10),
+    }))
+    .mutation(async ({ input }) => {
+      const { notifyOwner } = await import("./_core/notification");
+      const content = [
+        `Nome: ${input.name}`,
+        `E-mail: ${input.email}`,
+        `Assunto: ${input.subject}`,
+        ``,
+        `Mensagem:`,
+        input.message,
+      ].join("\n");
+      const ok = await notifyOwner({ title: `[NEXORA Contato] ${input.subject}`, content });
+      return { success: ok };
+    }),
+});
+
+// ─── App Router ────────────────────────────────────────────────────────────────────────────────
 export const appRouter = router({
   system: systemRouter,
   auth: authRouter,
@@ -560,6 +584,5 @@ export const appRouter = router({
   exams: examsRouter,
   vita: vitaRouter,
   dashboard: dashboardRouter,
-});
-
-export type AppRouter = typeof appRouter;
+  contact: contactRouter,
+});export type AppRouter = typeof appRouter;

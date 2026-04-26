@@ -83,3 +83,11 @@
 - [ ] Assinatura digital de documentos
 - [ ] Agenda de consultas com calendário
 - [ ] Relatórios e analytics avançados
+
+## Rodapé e Páginas Legais
+- [x] Criar componente Footer minimalista com links para Política de Privacidade, Termos de Uso e Contato
+- [x] Criar página /privacidade com política de privacidade
+- [x] Criar página /termos com termos de uso
+- [x] Criar página /contato com formulário de contato
+- [x] Adicionar Footer na landing page e na página de funcionalidades
+- [x] Registrar rotas das páginas legais no App.tsx

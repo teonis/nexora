@@ -14,6 +14,9 @@ import ConsultationDetail from "./pages/ConsultationDetail";
 import Clari from "./pages/Clari";
 import Documents from "./pages/Documents";
 import Features from "./pages/Features";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
+import Contact from "./pages/Contact";
 
 function Router() {
   return (
@@ -28,6 +31,9 @@ function Router() {
       <Route path="/clari" component={Clari} />
       <Route path="/documents" component={Documents} />
       <Route path="/funcionalidades" component={Features} />
+      <Route path="/privacidade" component={Privacy} />
+      <Route path="/termos" component={Terms} />
+      <Route path="/contato" component={Contact} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>

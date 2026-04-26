@@ -1148,20 +1148,69 @@ export default function Home() {
       </section>
 
       {/* ─── FOOTER ─── */}
-      <footer style={{
-        borderTop: "1px solid rgba(17,24,39,0.04)",
-        background: "#fff",
-      }}>
+      <footer style={{ borderTop: "1px solid #F3F4F6", background: "#fff" }}>
         <div style={{
-          maxWidth: 1080, margin: "0 auto", padding: "32px 24px",
-          display: "flex", alignItems: "center", justifyContent: "space-between",
-          flexWrap: "wrap", gap: 12,
+          maxWidth: 1080, margin: "0 auto", padding: "40px 24px 32px",
+          display: "flex", flexDirection: "column", gap: 24,
         }}>
-          <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.14em", color: "#D1D5DB" }}>NEXORA</span>
-          <p style={{ fontSize: 11, color: "#E5E7EB", textAlign: "center", margin: 0 }}>
-            Clari é suporte clínico. A decisão médica é sempre do profissional.
-          </p>
-          <p style={{ fontSize: 11, color: "#E5E7EB", margin: 0 }}>© {new Date().getFullYear()}</p>
+          {/* Top row */}
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: 24 }}>
+            {/* Brand */}
+            <div>
+              <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.12em", color: "#111827" }}>NEXORA</span>
+              <p style={{ fontSize: 12, color: "#9CA3AF", marginTop: 4, maxWidth: 260, lineHeight: 1.6 }}>
+                Plataforma de inteligência clínica com IA para médicos.
+              </p>
+            </div>
+
+            {/* Links */}
+            <nav style={{ display: "flex", gap: 32, flexWrap: "wrap" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.1em", color: "#9CA3AF", textTransform: "uppercase" }}>Plataforma</span>
+                <a href="/funcionalidades" style={{ fontSize: 12, color: "#6B7280", textDecoration: "none" }}
+                  onMouseEnter={e => (e.currentTarget.style.color = "#111827")}
+                  onMouseLeave={e => (e.currentTarget.style.color = "#6B7280")}>
+                  Funcionalidades
+                </a>
+                <a href={getLoginUrl()} style={{ fontSize: 12, color: "#6B7280", textDecoration: "none" }}
+                  onMouseEnter={e => (e.currentTarget.style.color = "#111827")}
+                  onMouseLeave={e => (e.currentTarget.style.color = "#6B7280")}>
+                  Acessar plataforma
+                </a>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.1em", color: "#9CA3AF", textTransform: "uppercase" }}>Legal</span>
+                <a href="/privacidade" style={{ fontSize: 12, color: "#6B7280", textDecoration: "none" }}
+                  onMouseEnter={e => (e.currentTarget.style.color = "#111827")}
+                  onMouseLeave={e => (e.currentTarget.style.color = "#6B7280")}>
+                  Política de Privacidade
+                </a>
+                <a href="/termos" style={{ fontSize: 12, color: "#6B7280", textDecoration: "none" }}
+                  onMouseEnter={e => (e.currentTarget.style.color = "#111827")}
+                  onMouseLeave={e => (e.currentTarget.style.color = "#6B7280")}>
+                  Termos de Uso
+                </a>
+                <a href="/contato" style={{ fontSize: 12, color: "#6B7280", textDecoration: "none" }}
+                  onMouseEnter={e => (e.currentTarget.style.color = "#111827")}
+                  onMouseLeave={e => (e.currentTarget.style.color = "#6B7280")}>
+                  Contato
+                </a>
+              </div>
+            </nav>
+          </div>
+
+          {/* Divider */}
+          <div style={{ borderTop: "1px solid #F3F4F6" }} />
+
+          {/* Bottom row */}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
+            <p style={{ fontSize: 11, color: "#D1D5DB", margin: 0 }}>
+              © {new Date().getFullYear()} NEXORA. Todos os direitos reservados.
+            </p>
+            <p style={{ fontSize: 11, color: "#D1D5DB", margin: 0, textAlign: "right" }}>
+              Clari é suporte clínico. A decisão médica é sempre do profissional.
+            </p>
+          </div>
         </div>
       </footer>
 
