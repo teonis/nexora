@@ -13,6 +13,7 @@ import Consultation from "./pages/Consultation";
 import ConsultationDetail from "./pages/ConsultationDetail";
 import Clari from "./pages/Clari";
 import Documents from "./pages/Documents";
+import Features from "./pages/Features";
 
 function Router() {
   return (
@@ -26,6 +27,7 @@ function Router() {
       <Route path="/consultation/:id" component={ConsultationDetail} />
       <Route path="/clari" component={Clari} />
       <Route path="/documents" component={Documents} />
+      <Route path="/funcionalidades" component={Features} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>

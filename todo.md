@@ -71,6 +71,11 @@
 - [x] Estados de loading/erro em todas as páginas
 - [x] Responsividade mobile-first
 
+## Página de Funcionalidades
+- [x] Criar página /funcionalidades com lista interativa de funcionalidades
+- [x] Adicionar link "Funcionalidades" na navbar da landing page
+- [x] Registrar rota /funcionalidades no App.tsx
+
 ## Melhorias Futuras (v2)
 - [ ] Notificações de retorno de pacientes inativos
 - [ ] Exportação de dados em CSV (admin only)

@@ -927,6 +927,14 @@ export default function Home() {
 
           {/* Nav */}
           <nav className="lp-nav-links">
+            <a
+              href="/funcionalidades"
+              style={{ fontSize: 13, color: "#9CA3AF", textDecoration: "none", fontWeight: 400, transition: "color 0.15s" }}
+              onMouseEnter={e => (e.currentTarget.style.color = "#374151")}
+              onMouseLeave={e => (e.currentTarget.style.color = "#9CA3AF")}
+            >
+              Funcionalidades
+            </a>
             <button
               onClick={() => document.getElementById("clari")?.scrollIntoView({ behavior: "smooth" })}
               className="lp-nav-clari"
