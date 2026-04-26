@@ -1,7 +1,7 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { getLoginUrl } from "@/const";
-import { ArrowRight, Bot, CheckCircle2 } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { ArrowRight, Bot, CheckCircle2, Mic, FileText, Stethoscope } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 
 /* ─── Fade-in on scroll ─── */
@@ -27,6 +27,265 @@ function FadeIn({ children, delay = 0 }: { children: React.ReactNode; delay?: nu
     return () => observer.disconnect();
   }, [delay]);
   return <div ref={ref}>{children}</div>;
+}
+
+/* ─── Animated Mockup ─── */
+const STEPS = [
+  {
+    id: "recording",
+    label: "Gravando consulta",
+    icon: Mic,
+    color: "#EF4444",
+    bg: "rgba(239,68,68,0.08)",
+    content: (
+      <div>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+          <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#EF4444", animation: "pulse 1.2s infinite" }} />
+          <span style={{ fontSize: 11, fontWeight: 600, color: "#EF4444" }}>Gravando</span>
+          <span style={{ fontSize: 11, color: "#9CA3AF", marginLeft: "auto" }}>00:02:14</span>
+        </div>
+        <div style={{ background: "#F9FAFB", borderRadius: 8, padding: "10px 12px" }}>
+          <p style={{ fontSize: 11, color: "#374151", lineHeight: 1.6, margin: 0 }}>
+            "...paciente refere dor torácica há 3 dias, piora ao esforço, sem irradiação..."
+          </p>
+        </div>
+        <div style={{ display: "flex", gap: 4, marginTop: 8, alignItems: "center" }}>
+          {Array.from({ length: 20 }).map((_, i) => (
+            <div key={i} style={{
+              width: 3, borderRadius: 2, background: "#C9A646",
+              height: Math.random() * 20 + 4,
+              opacity: 0.6 + Math.random() * 0.4,
+            }} />
+          ))}
+        </div>
+      </div>
+    ),
+  },
+  {
+    id: "transcribing",
+    label: "Transcrevendo com IA",
+    icon: FileText,
+    color: "#C9A646",
+    bg: "rgba(201,166,70,0.08)",
+    content: (
+      <div>
+        <div style={{ fontSize: 11, fontWeight: 600, color: "#C9A646", marginBottom: 10 }}>Transcrição em andamento...</div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+          {["S — Dor torácica há 3 dias, piora ao esforço", "O — PA 130/85, FC 88 bpm, ausculta normal", "A — Suspeita de angina estável", "P — ECG, troponina, encaminhar cardiologista"].map((line, i) => (
+            <div key={i} style={{
+              fontSize: 11, color: i < 2 ? "#374151" : "#9CA3AF",
+              padding: "6px 10px", borderRadius: 6,
+              background: i < 2 ? "#F9FAFB" : "transparent",
+              border: i < 2 ? "1px solid rgba(17,24,39,0.06)" : "none",
+              transition: "all 0.3s",
+            }}>{line}</div>
+          ))}
+        </div>
+      </div>
+    ),
+  },
+  {
+    id: "soap",
+    label: "SOAP gerado",
+    icon: Stethoscope,
+    color: "#10B981",
+    bg: "rgba(16,185,129,0.08)",
+    content: (
+      <div>
+        <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
+          <CheckCircle2 size={13} color="#10B981" />
+          <span style={{ fontSize: 11, fontWeight: 600, color: "#10B981" }}>SOAP gerado automaticamente</span>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+          {[
+            { tag: "S", text: "Dor torácica há 3 dias, piora ao esforço, sem irradiação" },
+            { tag: "O", text: "PA 130/85 mmHg, FC 88 bpm, ausculta cardíaca normal" },
+            { tag: "A", text: "Suspeita de angina estável — CID I20.8" },
+            { tag: "P", text: "ECG + troponina + encaminhamento cardiologista" },
+          ].map(({ tag, text }) => (
+            <div key={tag} style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
+              <span style={{
+                fontSize: 10, fontWeight: 800, color: "#C9A646",
+                background: "rgba(201,166,70,0.10)",
+                padding: "2px 6px", borderRadius: 4, flexShrink: 0, marginTop: 1,
+              }}>{tag}</span>
+              <span style={{ fontSize: 11, color: "#374151", lineHeight: 1.5 }}>{text}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    ),
+  },
+  {
+    id: "clari",
+    label: "Clari sugere conduta",
+    icon: Bot,
+    color: "#C9A646",
+    bg: "rgba(201,166,70,0.08)",
+    content: (
+      <div>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+          <div style={{ width: 24, height: 24, borderRadius: "50%", background: "rgba(201,166,70,0.12)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <Bot size={12} color="#C9A646" />
+          </div>
+          <span style={{ fontSize: 11, fontWeight: 700, color: "#C9A646" }}>Clari</span>
+          <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#22C55E", marginLeft: "auto" }} />
+        </div>
+        <p style={{ fontSize: 11, color: "#374151", lineHeight: 1.6, margin: "0 0 10px" }}>
+          Identifiquei padrões compatíveis com angina estável. Deseja explorar as condutas de primeira linha?
+        </p>
+        <div style={{ display: "flex", gap: 6 }}>
+          {["Ver evidências", "Gerar prescrição"].map(label => (
+            <span key={label} style={{
+              fontSize: 10, fontWeight: 600, padding: "4px 10px", borderRadius: 20,
+              background: label === "Ver evidências" ? "rgba(201,166,70,0.12)" : "#F3F4F6",
+              color: label === "Ver evidências" ? "#C9A646" : "#6B7280",
+              cursor: "pointer",
+            }}>{label}</span>
+          ))}
+        </div>
+      </div>
+    ),
+  },
+];
+
+function AnimatedMockup() {
+  const [step, setStep] = useState(0);
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setVisible(false);
+      setTimeout(() => {
+        setStep(s => (s + 1) % STEPS.length);
+        setVisible(true);
+      }, 350);
+    }, 3200);
+    return () => clearInterval(timer);
+  }, []);
+
+  const current = STEPS[step];
+  const Icon = current.icon;
+
+  return (
+    <div style={{ marginTop: 72, position: "relative" }}>
+      {/* Glow */}
+      <div style={{
+        position: "absolute", inset: "-40px",
+        background: "radial-gradient(ellipse 70% 50% at 50% 60%, rgba(201,166,70,0.09) 0%, transparent 70%)",
+        pointerEvents: "none",
+      }} />
+      <div style={{
+        background: "#fff",
+        borderRadius: 16,
+        border: "1px solid rgba(17,24,39,0.08)",
+        boxShadow: "0 8px 40px rgba(17,24,39,0.08), 0 1px 3px rgba(17,24,39,0.06)",
+        overflow: "hidden",
+        maxWidth: 780,
+        margin: "0 auto",
+        position: "relative",
+      }}>
+        {/* Browser bar */}
+        <div style={{
+          background: "#F3F4F6",
+          borderBottom: "1px solid rgba(17,24,39,0.07)",
+          padding: "10px 16px",
+          display: "flex", alignItems: "center", gap: 8,
+        }}>
+          <div style={{ display: "flex", gap: 6 }}>
+            {["#FF5F57","#FEBC2E","#28C840"].map(c => (
+              <div key={c} style={{ width: 10, height: 10, borderRadius: "50%", background: c }} />
+            ))}
+          </div>
+          <div style={{ flex: 1, background: "#E5E7EB", borderRadius: 6, height: 20, marginLeft: 8 }} />
+        </div>
+
+        {/* Dashboard layout */}
+        <div style={{ padding: "24px 24px 20px", display: "grid", gridTemplateColumns: "160px 1fr", gap: 20 }}>
+          {/* Sidebar */}
+          <div style={{ borderRight: "1px solid #F3F4F6", paddingRight: 16 }}>
+            <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.12em", color: "#111827", marginBottom: 16 }}>NEXORA</div>
+            {STEPS.map((s, i) => {
+              const SIcon = s.icon;
+              const active = i === step;
+              return (
+                <div
+                  key={s.id}
+                  onClick={() => { setVisible(false); setTimeout(() => { setStep(i); setVisible(true); }, 200); }}
+                  style={{
+                    fontSize: 11, padding: "7px 10px", borderRadius: 7, marginBottom: 3,
+                    background: active ? "#F9FAFB" : "transparent",
+                    color: active ? "#111827" : "#9CA3AF",
+                    fontWeight: active ? 600 : 400,
+                    borderLeft: active ? `2px solid ${s.color}` : "2px solid transparent",
+                    cursor: "pointer",
+                    display: "flex", alignItems: "center", gap: 6,
+                    transition: "all 0.2s",
+                  }}
+                >
+                  <SIcon size={11} color={active ? s.color : "#9CA3AF"} />
+                  {s.label}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Main panel */}
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
+              <div style={{
+                width: 28, height: 28, borderRadius: 8,
+                background: current.bg,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                transition: "background 0.3s",
+              }}>
+                <Icon size={14} color={current.color} />
+              </div>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "#111827" }}>Consulta em andamento</div>
+                <div style={{ fontSize: 10, color: "#9CA3AF" }}>Dr. Silva · Paciente: João M., 52 anos</div>
+              </div>
+              {/* Step indicators */}
+              <div style={{ marginLeft: "auto", display: "flex", gap: 5 }}>
+                {STEPS.map((_, i) => (
+                  <div key={i} style={{
+                    width: i === step ? 16 : 6, height: 6, borderRadius: 3,
+                    background: i === step ? current.color : "#E5E7EB",
+                    transition: "all 0.3s",
+                    cursor: "pointer",
+                  }}
+                    onClick={() => { setVisible(false); setTimeout(() => { setStep(i); setVisible(true); }, 200); }}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Animated content area */}
+            <div style={{
+              background: "#F9FAFB",
+              borderRadius: 12,
+              padding: "16px",
+              border: "1px solid rgba(17,24,39,0.06)",
+              minHeight: 140,
+              opacity: visible ? 1 : 0,
+              transform: visible ? "translateY(0)" : "translateY(6px)",
+              transition: "opacity 0.35s ease, transform 0.35s ease",
+            }}>
+              {current.content}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Pulse animation style */}
+      <style>{`
+        @keyframes pulse {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.4; transform: scale(0.85); }
+        }
+      `}</style>
+    </div>
+  );
 }
 
 export default function Home() {
@@ -157,103 +416,9 @@ export default function Home() {
           </div>
         </FadeIn>
 
-        {/* ─── Product mockup ─── */}
+        {/* ─── Animated Product Mockup ─── */}
         <FadeIn delay={120}>
-          <div style={{ marginTop: 72, position: "relative" }}>
-            {/* Glow */}
-            <div style={{
-              position: "absolute", inset: "-40px",
-              background: "radial-gradient(ellipse 70% 50% at 50% 60%, rgba(201,166,70,0.09) 0%, transparent 70%)",
-              pointerEvents: "none",
-            }} />
-            <div style={{
-              background: "#fff",
-              borderRadius: 16,
-              border: "1px solid rgba(17,24,39,0.08)",
-              boxShadow: "0 8px 40px rgba(17,24,39,0.08), 0 1px 3px rgba(17,24,39,0.06)",
-              overflow: "hidden",
-              maxWidth: 780,
-              margin: "0 auto",
-              position: "relative",
-            }}>
-              {/* Fake browser bar */}
-              <div style={{
-                background: "#F3F4F6",
-                borderBottom: "1px solid rgba(17,24,39,0.07)",
-                padding: "10px 16px",
-                display: "flex", alignItems: "center", gap: 8,
-              }}>
-                <div style={{ display: "flex", gap: 6 }}>
-                  {["#FF5F57","#FEBC2E","#28C840"].map(c => (
-                    <div key={c} style={{ width: 10, height: 10, borderRadius: "50%", background: c }} />
-                  ))}
-                </div>
-                <div style={{ flex: 1, background: "#E5E7EB", borderRadius: 6, height: 20, marginLeft: 8 }} />
-              </div>
-
-              {/* Dashboard preview */}
-              <div style={{ padding: "28px 28px 24px", display: "grid", gridTemplateColumns: "180px 1fr", gap: 20 }}>
-                {/* Sidebar */}
-                <div style={{ borderRight: "1px solid #F3F4F6", paddingRight: 20 }}>
-                  <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.12em", color: "#111827", marginBottom: 20 }}>NEXORA</div>
-                  {["Dashboard", "Pacientes", "Nova Consulta", "Clari", "Documentos"].map((item, i) => (
-                    <div key={item} style={{
-                      fontSize: 12, padding: "7px 10px", borderRadius: 7, marginBottom: 3,
-                      background: i === 0 ? "#F9FAFB" : "transparent",
-                      color: i === 0 ? "#111827" : "#9CA3AF",
-                      fontWeight: i === 0 ? 600 : 400,
-                      borderLeft: i === 0 ? "2px solid #C9A646" : "2px solid transparent",
-                    }}>{item}</div>
-                  ))}
-                </div>
-
-                {/* Main content */}
-                <div>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: "#111827", marginBottom: 4 }}>Boa tarde, Dr. Silva</div>
-                  <div style={{ fontSize: 11, color: "#9CA3AF", marginBottom: 20 }}>Domingo, 27 de abril de 2025</div>
-
-                  {/* Stats */}
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10, marginBottom: 20 }}>
-                    {[
-                      { label: "Consultas hoje", value: "8" },
-                      { label: "Pacientes", value: "142" },
-                      { label: "Documentos", value: "31" },
-                    ].map(({ label, value }) => (
-                      <div key={label} style={{
-                        background: "#F9FAFB", borderRadius: 10, padding: "12px 14px",
-                        border: "1px solid rgba(17,24,39,0.06)",
-                      }}>
-                        <div style={{ fontSize: 18, fontWeight: 800, color: "#111827" }}>{value}</div>
-                        <div style={{ fontSize: 10, color: "#9CA3AF", marginTop: 2 }}>{label}</div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Clari card */}
-                  <div style={{
-                    background: "rgba(201,166,70,0.05)",
-                    border: "1px solid rgba(201,166,70,0.15)",
-                    borderRadius: 10, padding: "12px 14px",
-                  }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-                      <div style={{
-                        width: 24, height: 24, borderRadius: "50%",
-                        background: "rgba(201,166,70,0.12)",
-                        display: "flex", alignItems: "center", justifyContent: "center",
-                      }}>
-                        <Bot size={12} color="#C9A646" />
-                      </div>
-                      <span style={{ fontSize: 11, fontWeight: 700, color: "#C9A646" }}>Clari</span>
-                      <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#22C55E", marginLeft: "auto" }} />
-                    </div>
-                    <p style={{ fontSize: 11, color: "#6B7280", lineHeight: 1.5, margin: 0 }}>
-                      SOAP gerado automaticamente. Deseja revisar as hipóteses diagnósticas?
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <AnimatedMockup />
         </FadeIn>
       </section>
 
