@@ -1,29 +1,90 @@
-import { ArrowLeft, Mail, MessageSquare, Send } from "lucide-react";
-import { useState } from "react";
+import { ArrowLeft, CheckCircle2, Mail, MessageSquare, Send } from "lucide-react";
+import { useState, useCallback } from "react";
 import { trpc } from "@/lib/trpc";
 
+// ─── Validation helpers ────────────────────────────────────────────────────────
+const validators = {
+  name: (v: string) => {
+    if (!v.trim()) return "Nome é obrigatório.";
+    if (v.trim().length < 3) return "Nome deve ter pelo menos 3 caracteres.";
+    if (v.trim().length > 80) return "Nome deve ter no máximo 80 caracteres.";
+    return "";
+  },
+  email: (v: string) => {
+    if (!v.trim()) return "E-mail é obrigatório.";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim())) return "Informe um e-mail válido.";
+    return "";
+  },
+  subject: (v: string) => {
+    if (!v) return "Selecione um assunto.";
+    return "";
+  },
+  message: (v: string) => {
+    if (!v.trim()) return "Mensagem é obrigatória.";
+    if (v.trim().length < 10) return "Mensagem deve ter pelo menos 10 caracteres.";
+    if (v.trim().length > 2000) return "Mensagem deve ter no máximo 2000 caracteres.";
+    return "";
+  },
+};
+
+type Field = keyof typeof validators;
+
+// ─── Component ─────────────────────────────────────────────────────────────────
 export default function Contact() {
   const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
+  const [touched, setTouched] = useState<Record<Field, boolean>>({ name: false, email: false, subject: false, message: false });
   const [sent, setSent] = useState(false);
-  const [error, setError] = useState("");
+  const [serverError, setServerError] = useState("");
 
   const sendContact = trpc.contact.send.useMutation({
     onSuccess: () => setSent(true),
-    onError: (err) => setError(err.message || "Erro ao enviar. Tente novamente."),
+    onError: (err) => setServerError(err.message || "Erro ao enviar. Tente novamente."),
   });
 
-  const inputStyle: React.CSSProperties = {
-    width: "100%", padding: "10px 14px", fontSize: 13, color: "#111827",
-    background: "#FAFAFA", border: "1px solid #E5E7EB", borderRadius: 8,
-    outline: "none", fontFamily: "Inter, system-ui, sans-serif",
-    transition: "border-color 0.15s, background 0.15s", boxSizing: "border-box",
+  // Compute per-field errors
+  const errors: Record<Field, string> = {
+    name: validators.name(form.name),
+    email: validators.email(form.email),
+    subject: validators.subject(form.subject),
+    message: validators.message(form.message),
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const isFormValid = Object.values(errors).every(e => e === "");
+
+  const handleChange = useCallback((field: Field, value: string) => {
+    setForm(f => ({ ...f, [field]: value }));
+    // Mark touched on first change
+    setTouched(t => ({ ...t, [field]: true }));
+  }, []);
+
+  const handleBlur = useCallback((field: Field) => {
+    setTouched(t => ({ ...t, [field]: true }));
+  }, []);
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
+    // Touch all fields to show all errors
+    setTouched({ name: true, email: true, subject: true, message: true });
+    if (!isFormValid) return;
+    setServerError("");
     sendContact.mutate(form);
   };
+
+  // ─── Styles ─────────────────────────────────────────────────────────────────
+  const getInputStyle = (field: Field): React.CSSProperties => {
+    const hasError = touched[field] && errors[field];
+    const isValid = touched[field] && !errors[field] && form[field];
+    return {
+      width: "100%", padding: "10px 14px", fontSize: 13, color: "#111827",
+      background: hasError ? "#FFF8F8" : isValid ? "#F0FDF4" : "#FAFAFA",
+      border: `1px solid ${hasError ? "#FCA5A5" : isValid ? "#86EFAC" : "#E5E7EB"}`,
+      borderRadius: 8, outline: "none", fontFamily: "Inter, system-ui, sans-serif",
+      transition: "border-color 0.15s, background 0.15s", boxSizing: "border-box",
+    };
+  };
+
+  const charCount = form.message.length;
+  const charLimit = 2000;
 
   return (
     <div style={{ background: "#fff", color: "#111827", fontFamily: "Inter, system-ui, sans-serif", minHeight: "100vh" }}>
@@ -84,47 +145,76 @@ export default function Contact() {
             <h2 style={{ fontSize: 20, fontWeight: 600, color: "#111827", margin: "0 0 8px" }}>Mensagem enviada</h2>
             <p style={{ fontSize: 14, color: "#6B7280", margin: "0 0 32px" }}>Obrigado pelo contato. Responderemos em breve.</p>
             <button
-              onClick={() => { setSent(false); setForm({ name: "", email: "", subject: "", message: "" }); }}
+              onClick={() => { setSent(false); setForm({ name: "", email: "", subject: "", message: "" }); setTouched({ name: false, email: false, subject: false, message: false }); }}
               style={{ fontSize: 13, color: "#9CA3AF", background: "none", border: "none", cursor: "pointer", textDecoration: "underline", fontFamily: "inherit" }}
             >
               Enviar outra mensagem
             </button>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+          <form onSubmit={handleSubmit} noValidate style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+
             {/* Name + Email */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+              {/* Name */}
               <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                <label style={{ fontSize: 12, fontWeight: 500, color: "#374151" }}>Nome</label>
+                <label style={{ fontSize: 12, fontWeight: 500, color: "#374151", display: "flex", alignItems: "center", gap: 4 }}>
+                  Nome
+                  {touched.name && !errors.name && form.name && <CheckCircle2 size={11} color="#16A34A" />}
+                </label>
                 <input
-                  type="text" required placeholder="Dr. João Silva" value={form.name}
-                  onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-                  style={inputStyle}
-                  onFocus={e => { e.currentTarget.style.borderColor = "#C9A646"; e.currentTarget.style.background = "#fff"; }}
-                  onBlur={e => { e.currentTarget.style.borderColor = "#E5E7EB"; e.currentTarget.style.background = "#FAFAFA"; }}
+                  type="text"
+                  placeholder="Dr. João Silva"
+                  value={form.name}
+                  onChange={e => handleChange("name", e.target.value)}
+                  onBlur={() => handleBlur("name")}
+                  style={getInputStyle("name")}
+                  onFocus={e => { if (!touched.name || !errors.name) { e.currentTarget.style.borderColor = "#C9A646"; e.currentTarget.style.background = "#fff"; } }}
                 />
+                {touched.name && errors.name && (
+                  <span style={{ fontSize: 11, color: "#DC2626", display: "flex", alignItems: "center", gap: 4 }}>
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    {errors.name}
+                  </span>
+                )}
               </div>
+
+              {/* Email */}
               <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                <label style={{ fontSize: 12, fontWeight: 500, color: "#374151" }}>E-mail</label>
+                <label style={{ fontSize: 12, fontWeight: 500, color: "#374151", display: "flex", alignItems: "center", gap: 4 }}>
+                  E-mail
+                  {touched.email && !errors.email && form.email && <CheckCircle2 size={11} color="#16A34A" />}
+                </label>
                 <input
-                  type="email" required placeholder="joao@clinica.com.br" value={form.email}
-                  onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
-                  style={inputStyle}
-                  onFocus={e => { e.currentTarget.style.borderColor = "#C9A646"; e.currentTarget.style.background = "#fff"; }}
-                  onBlur={e => { e.currentTarget.style.borderColor = "#E5E7EB"; e.currentTarget.style.background = "#FAFAFA"; }}
+                  type="email"
+                  placeholder="joao@clinica.com.br"
+                  value={form.email}
+                  onChange={e => handleChange("email", e.target.value)}
+                  onBlur={() => handleBlur("email")}
+                  style={getInputStyle("email")}
+                  onFocus={e => { if (!touched.email || !errors.email) { e.currentTarget.style.borderColor = "#C9A646"; e.currentTarget.style.background = "#fff"; } }}
                 />
+                {touched.email && errors.email && (
+                  <span style={{ fontSize: 11, color: "#DC2626", display: "flex", alignItems: "center", gap: 4 }}>
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    {errors.email}
+                  </span>
+                )}
               </div>
             </div>
 
             {/* Subject */}
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-              <label style={{ fontSize: 12, fontWeight: 500, color: "#374151" }}>Assunto</label>
+              <label style={{ fontSize: 12, fontWeight: 500, color: "#374151", display: "flex", alignItems: "center", gap: 4 }}>
+                Assunto
+                {touched.subject && !errors.subject && form.subject && <CheckCircle2 size={11} color="#16A34A" />}
+              </label>
               <select
-                required value={form.subject}
-                onChange={e => setForm(f => ({ ...f, subject: e.target.value }))}
-                style={{ ...inputStyle, cursor: "pointer" }}
-                onFocus={e => { e.currentTarget.style.borderColor = "#C9A646"; e.currentTarget.style.background = "#fff"; }}
-                onBlur={e => { e.currentTarget.style.borderColor = "#E5E7EB"; e.currentTarget.style.background = "#FAFAFA"; }}
+                value={form.subject}
+                onChange={e => handleChange("subject", e.target.value)}
+                onBlur={() => handleBlur("subject")}
+                style={{ ...getInputStyle("subject"), cursor: "pointer" }}
+                onFocus={e => { if (!touched.subject || !errors.subject) { e.currentTarget.style.borderColor = "#C9A646"; e.currentTarget.style.background = "#fff"; } }}
               >
                 <option value="">Selecione um assunto</option>
                 <option value="suporte">Suporte técnico</option>
@@ -133,40 +223,78 @@ export default function Contact() {
                 <option value="parceria">Parceria comercial</option>
                 <option value="outro">Outro</option>
               </select>
+              {touched.subject && errors.subject && (
+                <span style={{ fontSize: 11, color: "#DC2626", display: "flex", alignItems: "center", gap: 4 }}>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                  {errors.subject}
+                </span>
+              )}
             </div>
 
             {/* Message */}
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-              <label style={{ fontSize: 12, fontWeight: 500, color: "#374151" }}>Mensagem</label>
+              <label style={{ fontSize: 12, fontWeight: 500, color: "#374151", display: "flex", alignItems: "center", gap: 4 }}>
+                Mensagem
+                {touched.message && !errors.message && form.message && <CheckCircle2 size={11} color="#16A34A" />}
+              </label>
               <textarea
-                required rows={5} placeholder="Descreva sua dúvida ou solicitação..." value={form.message}
-                onChange={e => setForm(f => ({ ...f, message: e.target.value }))}
-                style={{ ...inputStyle, resize: "vertical", minHeight: 120 }}
-                onFocus={e => { e.currentTarget.style.borderColor = "#C9A646"; e.currentTarget.style.background = "#fff"; }}
-                onBlur={e => { e.currentTarget.style.borderColor = "#E5E7EB"; e.currentTarget.style.background = "#FAFAFA"; }}
+                rows={5}
+                placeholder="Descreva sua dúvida ou solicitação..."
+                value={form.message}
+                onChange={e => handleChange("message", e.target.value)}
+                onBlur={() => handleBlur("message")}
+                style={{ ...getInputStyle("message"), resize: "vertical", minHeight: 120 }}
+                onFocus={e => { if (!touched.message || !errors.message) { e.currentTarget.style.borderColor = "#C9A646"; e.currentTarget.style.background = "#fff"; } }}
               />
+              {/* Char counter + error */}
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                {touched.message && errors.message ? (
+                  <span style={{ fontSize: 11, color: "#DC2626", display: "flex", alignItems: "center", gap: 4 }}>
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    {errors.message}
+                  </span>
+                ) : <span />}
+                <span style={{ fontSize: 11, color: charCount > charLimit * 0.9 ? "#DC2626" : "#9CA3AF" }}>
+                  {charCount}/{charLimit}
+                </span>
+              </div>
             </div>
 
-            {/* Error message */}
-            {error && (
-              <div style={{ padding: "10px 14px", background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 8, fontSize: 12, color: "#DC2626" }}>
-                {error}
+            {/* Server error */}
+            {serverError && (
+              <div style={{ padding: "10px 14px", background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 8, fontSize: 12, color: "#DC2626", display: "flex", alignItems: "center", gap: 8 }}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                {serverError}
               </div>
             )}
 
             {/* Submit */}
-            <div style={{ display: "flex", justifyContent: "flex-end" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              {/* Progress indicator */}
+              <div style={{ display: "flex", gap: 4 }}>
+                {(["name", "email", "subject", "message"] as Field[]).map(field => (
+                  <div key={field} style={{
+                    width: 6, height: 6, borderRadius: "50%",
+                    background: !form[field] ? "#E5E7EB" : errors[field] ? "#FCA5A5" : "#86EFAC",
+                    transition: "background 0.2s",
+                  }} />
+                ))}
+              </div>
+
               <button
-                type="submit" disabled={sendContact.isPending}
+                type="submit"
+                disabled={sendContact.isPending}
                 style={{
                   display: "flex", alignItems: "center", gap: 8,
                   padding: "10px 24px", fontSize: 13, fontWeight: 500,
-                  background: sendContact.isPending ? "#E5E7EB" : "#111827", color: sendContact.isPending ? "#9CA3AF" : "#fff",
-                  border: "none", borderRadius: 8, cursor: sendContact.isPending ? "not-allowed" : "pointer",
+                  background: sendContact.isPending ? "#E5E7EB" : !isFormValid ? "#F3F4F6" : "#111827",
+                  color: sendContact.isPending ? "#9CA3AF" : !isFormValid ? "#9CA3AF" : "#fff",
+                  border: "none", borderRadius: 8,
+                  cursor: sendContact.isPending || !isFormValid ? "not-allowed" : "pointer",
                   fontFamily: "inherit", transition: "all 0.15s",
                 }}
-                onMouseEnter={e => { if (!sendContact.isPending) e.currentTarget.style.background = "#1F2937"; }}
-                onMouseLeave={e => { if (!sendContact.isPending) e.currentTarget.style.background = "#111827"; }}
+                onMouseEnter={e => { if (!sendContact.isPending && isFormValid) e.currentTarget.style.background = "#1F2937"; }}
+                onMouseLeave={e => { if (!sendContact.isPending && isFormValid) e.currentTarget.style.background = "#111827"; }}
               >
                 {sendContact.isPending ? (
                   <>
