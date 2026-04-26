@@ -225,7 +225,7 @@ export default function ConsultationDetail() {
         <div className="flex items-start gap-2 p-3 rounded-lg bg-amber-50 border border-amber-200">
           <Shield className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
           <p className="text-xs text-amber-800">
-            <strong>LGPD:</strong> O áudio gravado é processado e descartado automaticamente após a transcrição. Nenhum arquivo de áudio é armazenado. O Charcot IA é um suporte clínico — a decisão médica é responsabilidade do profissional.
+            <strong>LGPD:</strong> O áudio gravado é processado e descartado automaticamente após a transcrição. Nenhum arquivo de áudio é armazenado. O Vita AI é um suporte clínico — a decisão médica é responsabilidade do profissional.
           </p>
         </div>
 
@@ -243,9 +243,9 @@ export default function ConsultationDetail() {
               <Sparkles className="w-3.5 h-3.5 mr-1.5" />
               Documentos
             </TabsTrigger>
-            <TabsTrigger value="charcot" className="flex-1 sm:flex-none">
+            <TabsTrigger value="vita" className="flex-1 sm:flex-none">
               <Bot className="w-3.5 h-3.5 mr-1.5" />
-              Charcot IA
+              Vita AI
             </TabsTrigger>
           </TabsList>
 
@@ -529,9 +529,9 @@ export default function ConsultationDetail() {
             </div>
           </TabsContent>
 
-          {/* ─── Charcot IA Tab ─── */}
-          <TabsContent value="charcot" className="mt-4">
-            <CharcotChat consultationId={consultationId} />
+          {/* ─── Vita AI Tab ─── */}
+          <TabsContent value="vita" className="mt-4">
+            <VitaChat consultationId={consultationId} />
           </TabsContent>
         </Tabs>
       </div>
@@ -539,17 +539,17 @@ export default function ConsultationDetail() {
   );
 }
 
-// ─── Charcot IA Chat Component ────────────────────────────────────────────────
-function CharcotChat({ consultationId }: { consultationId: number }) {
+// ─── Vita AI Chat Component ────────────────────────────────────────────────
+function VitaChat({ consultationId }: { consultationId: number }) {
   const [message, setMessage] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const utils = trpc.useUtils();
 
-  const { data: messages, isLoading } = trpc.charcot.getMessages.useQuery({ consultationId });
+  const { data: messages, isLoading } = trpc.vita.getMessages.useQuery({ consultationId });
 
-  const sendMutation = trpc.charcot.sendMessage.useMutation({
+  const sendMutation = trpc.vita.sendMessage.useMutation({
     onSuccess: () => {
-      utils.charcot.getMessages.invalidate({ consultationId });
+      utils.vita.getMessages.invalidate({ consultationId });
       setMessage("");
     },
     onError: (err) => toast.error("Erro ao enviar mensagem: " + err.message),
@@ -572,7 +572,7 @@ function CharcotChat({ consultationId }: { consultationId: number }) {
           <Bot className="w-4 h-4 text-violet-600" />
         </div>
         <div>
-          <p className="text-sm font-semibold text-foreground">Charcot IA</p>
+          <p className="text-sm font-semibold text-foreground">Vita AI</p>
           <p className="text-[10px] text-muted-foreground">Assistente clínico baseado em evidências</p>
         </div>
       </div>
@@ -586,7 +586,7 @@ function CharcotChat({ consultationId }: { consultationId: number }) {
         ) : !messages?.length ? (
           <div className="text-center py-8">
             <Bot className="w-8 h-8 text-muted-foreground/30 mx-auto mb-2" />
-            <p className="text-sm text-muted-foreground">Olá! Sou o Charcot IA.</p>
+            <p className="text-sm text-muted-foreground">Olá! Sou o Vita AI.</p>
             <p className="text-xs text-muted-foreground/70 mt-1">Faça perguntas sobre o caso clínico, diagnóstico diferencial, conduta ou medicamentos.</p>
           </div>
         ) : (
@@ -625,7 +625,7 @@ function CharcotChat({ consultationId }: { consultationId: number }) {
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSend()}
-          placeholder="Pergunte ao Charcot IA..."
+          placeholder="Pergunte ao Vita AI..."
           className="flex-1 text-sm bg-muted border border-border rounded-lg px-3 py-2 outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all"
           disabled={sendMutation.isPending}
         />

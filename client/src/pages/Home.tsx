@@ -18,7 +18,7 @@ const features = [
   },
   {
     icon: Bot,
-    title: "Charcot IA",
+    title: "Vita AI",
     description: "Assistente clínico inteligente com suporte baseado em evidências, alertas de interações e sugestões de conduta.",
   },
   {
@@ -87,7 +87,7 @@ export default function Home() {
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/8 border border-primary/15 text-primary text-xs font-medium mb-6">
               <Bot className="w-3.5 h-3.5" />
-              Plataforma de IA Clínica — Charcot IA
+              Plataforma de IA Clínica — Vita AI
             </div>
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold text-foreground leading-tight tracking-tight mb-6">
@@ -115,7 +115,7 @@ export default function Home() {
             <div className="mt-8 flex items-start gap-2 p-3 rounded-lg bg-amber-50 border border-amber-200 max-w-lg">
               <Shield className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
               <p className="text-xs text-amber-800 leading-relaxed">
-                <strong>Aviso importante:</strong> O Charcot IA é uma ferramenta de suporte clínico. A responsabilidade pelo diagnóstico e conduta médica é sempre do profissional. Conformidade com LGPD e CFM.
+                <strong>Aviso importante:</strong> O Vita AI é uma ferramenta de suporte clínico. A responsabilidade pelo diagnóstico e conduta médica é sempre do profissional. Conformidade com LGPD e CFM.
               </p>
             </div>
           </div>
@@ -160,7 +160,7 @@ export default function Home() {
               Pronto para transformar sua prática clínica?
             </h2>
             <p className="text-muted-foreground mb-6">
-              Acesse a plataforma e experimente o Charcot IA na sua próxima consulta.
+              Acesse a plataforma e experimente o Vita AI na sua próxima consulta.
             </p>
             <Button
               size="lg"
@@ -183,7 +183,7 @@ export default function Home() {
             <span className="text-xs text-muted-foreground">Clinical AI — Assistente Clínico com IA</span>
           </div>
           <p className="text-xs text-muted-foreground text-center">
-            ⚠️ Charcot IA é suporte clínico. Decisão médica é responsabilidade do profissional. Conformidade LGPD.
+            ⚠️ Vita AI é suporte clínico. Decisão médica é responsabilidade do profissional. Conformidade LGPD.
           </p>
         </div>
       </footer>

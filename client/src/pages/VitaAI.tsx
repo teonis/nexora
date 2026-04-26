@@ -4,13 +4,13 @@ import { trpc } from "@/lib/trpc";
 import { Bot, ChevronRight, Clock, Loader2, Stethoscope } from "lucide-react";
 import { useLocation } from "wouter";
 
-export default function CharcotIA() {
+export default function VitaAI() {
   const [, navigate] = useLocation();
   const { data: consultations, isLoading } = trpc.consultations.list.useQuery({ limit: 10 });
 
   return (
     <ClinicalLayout
-      title="Charcot IA"
+      title="Vita AI"
       subtitle="Assistente clínico baseado em evidências"
     >
       <div className="max-w-3xl space-y-5">
@@ -21,13 +21,13 @@ export default function CharcotIA() {
               <Bot className="w-6 h-6 text-violet-600" />
             </div>
             <div>
-              <h2 className="text-base font-semibold text-foreground">Charcot IA</h2>
+              <h2 className="text-base font-semibold text-foreground">Vita AI</h2>
               <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
-                O Charcot IA é seu assistente clínico contextual. Para aproveitar ao máximo, acesse-o diretamente durante uma consulta — ele terá acesso ao contexto do paciente, transcrição e nota SOAP para fornecer suporte mais preciso.
+                O Vita AI é seu assistente clínico contextual. Para aproveitar ao máximo, acesse-o diretamente durante uma consulta — ele terá acesso ao contexto do paciente, transcrição e nota SOAP para fornecer suporte mais preciso.
               </p>
               <div className="mt-3 p-2.5 rounded-lg bg-amber-50 border border-amber-200">
                 <p className="text-xs text-amber-800">
-                  ⚠️ O Charcot IA fornece sugestões baseadas em evidências científicas. A decisão clínica final é sempre responsabilidade do médico, em conformidade com as diretrizes do CFM.
+                  ⚠️ O Vita AI fornece sugestões baseadas em evidências científicas. A decisão clínica final é sempre responsabilidade do médico, em conformidade com as diretrizes do CFM.
                 </p>
               </div>
             </div>
@@ -46,7 +46,7 @@ export default function CharcotIA() {
               <div className="p-8 text-center">
                 <Stethoscope className="w-8 h-8 text-muted-foreground/30 mx-auto mb-2" />
                 <p className="text-sm text-muted-foreground">Nenhuma consulta em andamento</p>
-                <p className="text-xs text-muted-foreground/70 mt-1">Inicie uma consulta para usar o Charcot IA com contexto do paciente</p>
+                <p className="text-xs text-muted-foreground/70 mt-1">Inicie uma consulta para usar o Vita AI com contexto do paciente</p>
                 <Button size="sm" className="mt-3" onClick={() => navigate("/consultation/new")}>
                   Nova Consulta
                 </Button>

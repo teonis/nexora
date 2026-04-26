@@ -119,11 +119,11 @@ describe("documents.byConsultation", () => {
   });
 });
 
-describe("charcot.getMessages", () => {
+describe("vita.getMessages", () => {
   it("returns empty messages for new consultation", async () => {
     const ctx = createAuthContext();
     const caller = appRouter.createCaller(ctx);
-    const result = await caller.charcot.getMessages({ consultationId: 1 });
+    const result = await caller.vita.getMessages({ consultationId: 1 });
     expect(Array.isArray(result)).toBe(true);
     expect(result.length).toBe(0);
   });

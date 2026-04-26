@@ -337,7 +337,7 @@ const documentsRouter = router({
 ${typeInstructions[input.type]}
 Use terminologia médica adequada, seja preciso e profissional.
 Siga as normas do CFM e da legislação brasileira.
-Inclua no rodapé: "Este documento foi gerado com auxílio de IA (Charcot IA) e revisado pelo médico responsável."`,
+Inclua no rodapé: "Este documento foi gerado com auxílio de IA (Vita AI) e revisado pelo médico responsável."`,
           },
           {
             role: "user",
@@ -459,8 +459,8 @@ const examsRouter = router({
     }),
 });
 
-// ─── Charcot IA Router ────────────────────────────────────────────────────────
-const charcotRouter = router({
+// ─── Vita AI Router ────────────────────────────────────────────────────────
+const vitaRouter = router({
   getMessages: protectedProcedure
     .input(z.object({ consultationId: z.number() }))
     .query(async ({ ctx, input }) => {
@@ -504,7 +504,7 @@ const charcotRouter = router({
         messages: [
           {
             role: "system",
-            content: `Você é o Charcot IA, um assistente clínico especializado para médicos brasileiros.
+            content: `Você é o Vita AI, um assistente clínico especializado para médicos brasileiros.
 Você fornece suporte baseado em evidências científicas, diretrizes clínicas atualizadas e literatura médica.
 Responda sempre em português brasileiro com precisão e objetividade.
 IMPORTANTE: Sempre inclua ao final de cada resposta o aviso: "⚠️ Esta é uma sugestão baseada em evidências. A decisão clínica final é responsabilidade do médico."
@@ -558,7 +558,7 @@ export const appRouter = router({
   consultations: consultationsRouter,
   documents: documentsRouter,
   exams: examsRouter,
-  charcot: charcotRouter,
+  vita: vitaRouter,
   dashboard: dashboardRouter,
 });
 

@@ -24,7 +24,7 @@ const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: Home },
   { href: "/patients", label: "Pacientes", icon: Users },
   { href: "/consultation/new", label: "Nova Consulta", icon: Stethoscope },
-  { href: "/charcot", label: "Charcot IA", icon: Bot },
+  { href: "/vita", label: "Vita AI", icon: Bot },
   { href: "/documents", label: "Documentos", icon: FileText },
 ];
 
@@ -126,7 +126,7 @@ export default function ClinicalLayout({ children, title, subtitle, actions }: C
           <div className="flex items-start gap-2">
             <Zap className="w-3.5 h-3.5 text-amber-400 mt-0.5 flex-shrink-0" />
             <p className="text-[10px] text-amber-300/80 leading-relaxed">
-              Charcot IA é um suporte clínico. A decisão médica final é sempre do profissional.
+              Vita AI é um suporte clínico. A decisão médica final é sempre do profissional.
             </p>
           </div>
         </div>
