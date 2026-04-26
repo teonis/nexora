@@ -365,11 +365,11 @@ function AnimatedMockup() {
         }
         .mockup-shell {
           background: #fff;
-          border-radius: 14px;
+          border-radius: 16px;
           border: 1px solid rgba(17,24,39,0.06);
-          box-shadow: 0 4px 32px rgba(17,24,39,0.06);
+          box-shadow: 0 8px 48px rgba(17,24,39,0.09);
           overflow: hidden;
-          max-width: 780px;
+          max-width: 980px;
           margin: 0 auto;
           position: relative;
         }
@@ -396,10 +396,11 @@ function AnimatedMockup() {
           flex-shrink: 0;
         }
         .mockup-body {
-          padding: 18px 18px 16px;
+          padding: 24px 24px 22px;
           display: grid;
-          grid-template-columns: 140px 1fr;
-          gap: 16px;
+          grid-template-columns: 170px 1fr;
+          gap: 20px;
+          min-height: 320px;
         }
         .mockup-sidebar {
           border-right: 1px solid #F3F4F6;
@@ -968,7 +969,7 @@ export default function Home() {
       </header>
 
       {/* ─── HERO ─── */}
-      <section className="lp-hero" style={{ maxWidth: 1080, margin: "0 auto", textAlign: "center" }}>
+      <section className="lp-hero" style={{ maxWidth: 1120, margin: "0 auto", textAlign: "center" }}>
         <FadeIn>
           {/* Label */}
           <div style={{ display: "inline-flex", alignItems: "center", gap: 6, marginBottom: 32 }}>
