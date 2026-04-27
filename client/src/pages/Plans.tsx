@@ -4,6 +4,7 @@ import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { getLoginUrl } from "@/const";
 import PublicNav from "@/components/PublicNav";
+import { toast } from "sonner";
 
 const GOLD = "#C9A646";
 const DARK = "#0A0F1E";
@@ -25,43 +26,22 @@ function CheckIcon() {
   );
 }
 
-// ─── Toast ────────────────────────────────────────────────────────────────────
-function Toast({ message, type, onClose }: { message: string; type: "success" | "error" | "info"; onClose: () => void }) {
-  useEffect(() => {
-    const t = setTimeout(onClose, 5000);
-    return () => clearTimeout(t);
-  }, [onClose]);
-
-  const bg = type === "success" ? "#16A34A" : type === "error" ? "#DC2626" : "#1D4ED8";
-  return (
-    <div style={{
-      position: "fixed", bottom: 24, right: 24, zIndex: 9999,
-      background: bg, color: "#fff", padding: "12px 20px",
-      borderRadius: 10, boxShadow: "0 4px 20px rgba(0,0,0,0.2)",
-      maxWidth: 360, fontSize: 14, lineHeight: 1.5,
-      display: "flex", alignItems: "flex-start", gap: 10,
-    }}>
-      <span style={{ flex: 1 }}>{message}</span>
-      <button onClick={onClose} style={{ background: "none", border: "none", color: "#fff", cursor: "pointer", fontSize: 16, lineHeight: 1 }}>×</button>
-    </div>
-  );
-}
+// Toast is handled by sonner (imported above)
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function Plans() {
   const [, navigate] = useLocation();
   const { user } = useAuth();
-  const [toast, setToast] = useState<{ message: string; type: "success" | "error" | "info" } | null>(null);
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
 
   // Read URL params for success/cancel feedback
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("success") === "true") {
-      setToast({ message: "Assinatura ativada com sucesso! Bem-vindo ao NEXORA Pro.", type: "success" });
+      toast.success("Assinatura ativada com sucesso! Bem-vindo ao NEXORA Pro.");
       window.history.replaceState({}, "", "/planos");
     } else if (params.get("cancelled") === "true") {
-      setToast({ message: "Checkout cancelado. Você pode assinar a qualquer momento.", type: "info" });
+      toast.info("Checkout cancelado. Você pode assinar a qualquer momento.");
       window.history.replaceState({}, "", "/planos");
     }
   }, []);
@@ -75,12 +55,12 @@ export default function Plans() {
     onSuccess: (data) => {
       if (data.url) {
         window.open(data.url, "_blank");
-        setToast({ message: "Redirecionando para o checkout seguro do Stripe...", type: "info" });
+        toast.info("Redirecionando para o checkout seguro do Stripe...");
       }
       setLoadingPlan(null);
     },
     onError: (err) => {
-      setToast({ message: err.message || "Erro ao criar sessão de checkout.", type: "error" });
+      toast.error(err.message || "Erro ao criar sessão de checkout.");
       setLoadingPlan(null);
     },
   });
@@ -91,7 +71,7 @@ export default function Plans() {
       setLoadingPlan(null);
     },
     onError: (err) => {
-      setToast({ message: err.message || "Erro ao abrir portal de faturamento.", type: "error" });
+      toast.error(err.message || "Erro ao abrir portal de faturamento.");
       setLoadingPlan(null);
     },
   });
@@ -392,10 +372,7 @@ export default function Plans() {
         </div>
       </footer>
 
-      {/* Toast */}
-      {toast && (
-        <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />
-      )}
+      {/* Toast is handled by sonner globally */}
     </div>
   );
 }

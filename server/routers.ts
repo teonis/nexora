@@ -414,6 +414,18 @@ Inclua no rodapé: "Este documento foi gerado com auxílio de IA (Clari) e revis
   update: protectedProcedure
     .input(z.object({ id: z.number(), content: z.string() }))
     .mutation(async ({ ctx, input }) => {
+      // Verify ownership before updating
+      const { getDb } = await import("./db");
+      const { clinicalDocuments: clinDocs } = await import("../drizzle/schema");
+      const { eq: eqDoc, and: andDoc } = await import("drizzle-orm");
+      const dbConn = await getDb();
+      if (!dbConn) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+      const owned = await dbConn
+        .select({ id: clinDocs.id })
+        .from(clinDocs)
+        .where(andDoc(eqDoc(clinDocs.id, input.id), eqDoc(clinDocs.doctorId, ctx.user.id)))
+        .limit(1);
+      if (!owned[0]) throw new TRPCError({ code: "NOT_FOUND", message: "Documento n\u00e3o encontrado" });
       await updateClinicalDocument(input.id, { content: input.content });
       return { success: true };
     }),

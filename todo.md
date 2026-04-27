@@ -136,3 +136,9 @@
 - [x] Criar componente PublicNav compartilhado com estilo consistente (logo NEXORA + links Funcionalidades/Planos + botão Entrar/Dashboard + indicador de página ativa)
 - [x] Substituir headers inline em Home.tsx, Features.tsx e Plans.tsx pelo PublicNav
 - [x] Corrigir botão "Ver como funciona" na Home.tsx para navegar para /funcionalidades (era scroll para #valor)
+
+## Correções da Auditoria Completa (27/04/2026)
+
+- [x] FIX-1: documents.update não verificava doctorId — corrigido: verifica propriedade antes de atualizar
+- [x] FIX-2: user.specialty null no perfil — comportamento esperado (campo a ser preenchido pelo médico em Configurações), seletor mostra placeholder adequado
+- [x] FIX-3: Plans.tsx usava toast local (useState) — migrado para sonner (padrão do sistema)

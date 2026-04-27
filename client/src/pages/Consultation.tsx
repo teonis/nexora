@@ -164,6 +164,9 @@ export default function Consultation() {
               {defaultSpecialty && !specialty && (
                 <span className="ml-1 text-primary">(padrão do perfil)</span>
               )}
+              {!defaultSpecialty && !specialty && user && (
+                <span className="ml-1 text-muted-foreground/60">— <a href="/perfil" className="underline hover:text-primary">defina no perfil</a> para pré-preencher</span>
+              )}
             </Label>
             <Select value={effectiveSpecialty} onValueChange={setSpecialty}>
               <SelectTrigger id="specialty">
