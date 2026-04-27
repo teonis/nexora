@@ -3,6 +3,7 @@ import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { getLoginUrl } from "@/const";
+import PublicNav from "@/components/PublicNav";
 
 const GOLD = "#C9A646";
 const DARK = "#0A0F1E";
@@ -146,33 +147,7 @@ export default function Plans() {
   return (
     <div style={{ minHeight: "100vh", background: "#F9FAFB", fontFamily: "'Sora', sans-serif" }}>
       {/* Navbar */}
-      <nav style={{
-        position: "sticky", top: 0, zIndex: 100,
-        background: "rgba(249,250,251,0.95)", backdropFilter: "blur(12px)",
-        borderBottom: "1px solid #E5E7EB",
-        padding: "0 32px", height: 64,
-        display: "flex", alignItems: "center", justifyContent: "space-between",
-      }}>
-        <a href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-          <img src="https://manus.space/manus-storage/nexora-icon-2_1777246452.png" alt="N" style={{ width: 32, height: 32 }} />
-          <span style={{ fontWeight: 700, fontSize: 18, color: DARK, letterSpacing: "-0.02em" }}>NEXORA</span>
-        </a>
-        <div style={{ display: "flex", gap: 24, alignItems: "center" }}>
-          <a href="/funcionalidades" style={{ color: "#6B7280", fontSize: 14, textDecoration: "none" }}>Funcionalidades</a>
-          <a href="/planos" style={{ color: DARK, fontSize: 14, fontWeight: 600, textDecoration: "none" }}>Planos</a>
-          {user ? (
-            <a href="/dashboard" style={{
-              background: DARK, color: "#fff", padding: "8px 18px",
-              borderRadius: 8, fontSize: 14, fontWeight: 600, textDecoration: "none",
-            }}>Dashboard</a>
-          ) : (
-            <a href={getLoginUrl()} style={{
-              background: DARK, color: "#fff", padding: "8px 18px",
-              borderRadius: 8, fontSize: 14, fontWeight: 600, textDecoration: "none",
-            }}>Entrar</a>
-          )}
-        </div>
-      </nav>
+      <PublicNav />
 
       {/* Hero */}
       <div style={{ textAlign: "center", padding: "80px 24px 48px" }}>

@@ -1,5 +1,6 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { getLoginUrl } from "@/const";
+import PublicNav from "@/components/PublicNav";
 import {
   ArrowRight, Mic, FileText, Bot, Upload, Shield,
   Users, Stethoscope, ClipboardList, Download,
@@ -282,27 +283,7 @@ export default function Features() {
       `}</style>
 
       {/* ─── NAVBAR ─── */}
-      <header style={{
-        position: "sticky", top: 0, zIndex: 50,
-        background: "rgba(255,255,255,0.92)",
-        backdropFilter: "blur(16px)",
-        borderBottom: "1px solid rgba(17,24,39,0.05)",
-      }}>
-        <div style={{ maxWidth: 1080, margin: "0 auto", padding: "0 20px", height: 60, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <Link href="/" style={{ textDecoration: "none" }}><img src="/manus-storage/4_7e59f0e2.png" alt="NEXORA" style={{ height: 26, objectFit: "contain" }} /></Link>
-          <div style={{ display: "flex", alignItems: "center", gap: 28 }}>
-            <span style={{ fontSize: 13, color: "#111827", fontWeight: 500 }}>Funcionalidades</span>
-            <a
-              href={isAuthenticated ? "/dashboard" : getLoginUrl()}
-              style={{ fontSize: 13, fontWeight: 500, color: "#9CA3AF", textDecoration: "none", transition: "color 0.15s" }}
-              onMouseEnter={e => (e.currentTarget.style.color = "#374151")}
-              onMouseLeave={e => (e.currentTarget.style.color = "#9CA3AF")}
-            >
-              {isAuthenticated ? "Dashboard →" : "Entrar →"}
-            </a>
-          </div>
-        </div>
-      </header>
+      <PublicNav />
 
       {/* ─── HERO ─── */}
       <section className="fp-hero" style={{ maxWidth: 720, margin: "0 auto", textAlign: "center", padding: "100px 24px 72px" }}>

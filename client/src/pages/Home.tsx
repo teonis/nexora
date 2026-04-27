@@ -3,6 +3,7 @@ import { getLoginUrl } from "@/const";
 import { ArrowRight, Bot, CheckCircle2, Mic, FileText, Stethoscope } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
+import PublicNav from "@/components/PublicNav";
 
 /* ─── Fade-in on scroll ─── */
 function FadeIn({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
@@ -946,59 +947,7 @@ export default function Home() {
       `}</style>
 
       {/* ─── NAVBAR ─── */}
-      <header style={{
-        position: "sticky", top: 0, zIndex: 50,
-        background: "rgba(255,255,255,0.90)",
-        backdropFilter: "blur(16px)",
-        borderBottom: "1px solid rgba(17,24,39,0.05)",
-      }}>
-        <div style={{ maxWidth: 1080, margin: "0 auto", padding: "0 20px", height: 60, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          {/* Logo */}
-          <img src="/manus-storage/4_7e59f0e2.png" alt="NEXORA" style={{ height: 28, objectFit: "contain" }} />
-
-          {/* Nav */}
-          <nav className="lp-nav-links">
-            <a
-              href="/funcionalidades"
-              style={{ fontSize: 13, color: "#9CA3AF", textDecoration: "none", fontWeight: 400, transition: "color 0.15s" }}
-              onMouseEnter={e => (e.currentTarget.style.color = "#374151")}
-              onMouseLeave={e => (e.currentTarget.style.color = "#9CA3AF")}
-            >
-              Funcionalidades
-            </a>
-            <a
-              href="/planos"
-              style={{ fontSize: 13, color: "#9CA3AF", textDecoration: "none", fontWeight: 400, transition: "color 0.15s" }}
-              onMouseEnter={e => (e.currentTarget.style.color = "#374151")}
-              onMouseLeave={e => (e.currentTarget.style.color = "#9CA3AF")}
-            >
-              Planos
-            </a>
-            <button
-              onClick={() => document.getElementById("clari")?.scrollIntoView({ behavior: "smooth" })}
-              className="lp-nav-clari"
-              style={{ fontSize: 13, color: "#9CA3AF", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", fontWeight: 400 }}
-              onMouseEnter={e => (e.currentTarget.style.color = "#374151")}
-              onMouseLeave={e => (e.currentTarget.style.color = "#9CA3AF")}
-            >
-              Clari
-            </button>
-            <a
-              href={getLoginUrl()}
-              style={{
-                fontSize: 13, fontWeight: 500, color: "#374151",
-                background: "transparent", border: "none",
-                padding: "7px 0", textDecoration: "none",
-                transition: "color 0.15s",
-              }}
-              onMouseEnter={e => (e.currentTarget.style.color = "#111827")}
-              onMouseLeave={e => (e.currentTarget.style.color = "#374151")}
-            >
-              Entrar →
-            </a>
-          </nav>
-        </div>
-      </header>
+      <PublicNav />
 
       {/* ─── HERO ─── */}
       <section className="lp-hero" style={{ maxWidth: 1120, margin: "0 auto", textAlign: "center" }}>
@@ -1055,21 +1004,20 @@ export default function Home() {
             >
               Começar agora
             </a>
-            <button
-              onClick={() => document.getElementById("valor")?.scrollIntoView({ behavior: "smooth" })}
+            <a
+              href="/funcionalidades"
               style={{
                 display: "inline-flex", alignItems: "center", gap: 6,
                 padding: "12px 0", borderRadius: 0,
                 background: "transparent", color: "#9CA3AF",
-                fontSize: 14, fontWeight: 400, border: "none",
-                cursor: "pointer", fontFamily: "inherit",
+                fontSize: 14, fontWeight: 400, textDecoration: "none",
                 transition: "color 0.15s",
               }}
               onMouseEnter={e => { e.currentTarget.style.color = "#374151"; }}
               onMouseLeave={e => { e.currentTarget.style.color = "#9CA3AF"; }}
             >
               Ver como funciona
-            </button>
+            </a>
           </div>
         </FadeIn>
 

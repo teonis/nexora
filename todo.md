@@ -130,3 +130,9 @@
 - [x] 3B: Criar server/_core/pdfGenerator.ts com função generateClinicalPdf (cabeçalho médico, dados paciente, rodapé LGPD, fonte Roboto)
 - [x] 3C: Adicionar endpoint documents.exportPdf no router (retorna base64 + filename)
 - [x] 3D: Atualizar frontend para usar novo PDF em ConsultationDetail.tsx e Documents.tsx (substituir window.print())
+
+## Correções de Header e Navegação Pública
+
+- [x] Criar componente PublicNav compartilhado com estilo consistente (logo NEXORA + links Funcionalidades/Planos + botão Entrar/Dashboard + indicador de página ativa)
+- [x] Substituir headers inline em Home.tsx, Features.tsx e Plans.tsx pelo PublicNav
+- [x] Corrigir botão "Ver como funciona" na Home.tsx para navegar para /funcionalidades (era scroll para #valor)
