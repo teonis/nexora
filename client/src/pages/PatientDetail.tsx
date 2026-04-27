@@ -2,8 +2,10 @@ import ClinicalLayout from "@/components/ClinicalLayout";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trpc } from "@/lib/trpc";
+import ProblemList from "@/components/ProblemList";
 import {
   ArrowLeft,
+  Activity,
   Calendar,
   ChevronRight,
   Clock,
@@ -172,6 +174,10 @@ export default function PatientDetail() {
               <Upload className="w-3.5 h-3.5 mr-1.5" />
               Exames ({exams?.length ?? 0})
             </TabsTrigger>
+            <TabsTrigger value="problems" className="flex-1 sm:flex-none">
+              <Activity className="w-3.5 h-3.5 mr-1.5" />
+              Problemas
+            </TabsTrigger>
             <TabsTrigger value="history" className="flex-1 sm:flex-none">
               <User className="w-3.5 h-3.5 mr-1.5" />
               Histórico
@@ -290,6 +296,19 @@ export default function PatientDetail() {
                   </div>
                 )}
               </div>
+            </div>
+          </TabsContent>
+
+          {/* Problems tab */}
+          <TabsContent value="problems" className="mt-4">
+            <div className="bg-card border border-border rounded-xl p-5">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h3 className="text-sm font-semibold text-foreground">Lista de Problemas</h3>
+                  <p className="text-xs text-muted-foreground mt-0.5">Problemas e diagnósticos identificados pela IA ao longo das consultas</p>
+                </div>
+              </div>
+              <ProblemList patientId={patientId} />
             </div>
           </TabsContent>
 

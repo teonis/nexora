@@ -106,3 +106,27 @@
 - [x] Adicionar indicador de plano ativo na sidebar do ClinicalLayout
 - [x] Adicionar link Planos no navItems da sidebar
 - [x] Escrever testes unitários para routers Stripe (7 testes passando)
+
+## Tarefa 1 — Especialidade por Consulta + SOAP Especializado
+
+- [x] 1A: Adicionar campo `specialty` na tabela `consultations` (drizzle/schema.ts) e rodar pnpm db:push
+- [x] 1B: Atualizar router `consultations.create` para aceitar e salvar `specialty`
+- [x] 1C: Criar função `getUserById` em server/db.ts
+- [x] 1D: Atualizar prompt do `consultations.generateSoap` com instruções específicas por especialidade (11 especialidades)
+- [x] 1E: Adicionar seletor de especialidade na tela de nova consulta (Consultation.tsx) com padrão do perfil
+
+## Tarefa 2 — Lista de Problemas Assistida por IA
+
+- [x] 2A: Criar tabela `patient_problems` no schema e rodar pnpm db:push
+- [x] 2B: Criar funções de banco para patient_problems em server/db.ts
+- [x] 2C: Criar router `problems` em routers.ts (byPatient, update, extractFromSoap)
+- [x] 2D: Chamar extração automática de problemas após generateSoap (background, não bloqueia)
+- [x] 2E: Criar componente ProblemList.tsx com badges de status e dropdown de alteração
+- [x] 2F: Exibir problemas ativos como contexto na tela de consulta (banner compacto) e aba completa no PatientDetail
+
+## Tarefa 3 — PDF de Qualidade com pdfmake
+
+- [x] 3A: Instalar pdfmake e @types/pdfmake
+- [x] 3B: Criar server/_core/pdfGenerator.ts com função generateClinicalPdf (cabeçalho médico, dados paciente, rodapé LGPD, fonte Roboto)
+- [x] 3C: Adicionar endpoint documents.exportPdf no router (retorna base64 + filename)
+- [x] 3D: Atualizar frontend para usar novo PDF em ConsultationDetail.tsx e Documents.tsx (substituir window.print())

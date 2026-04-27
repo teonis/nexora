@@ -62,6 +62,7 @@ export const consultations = mysqlTable("consultations", {
   doctorId: int("doctorId").notNull(),
   status: mysqlEnum("status", ["in_progress", "completed", "cancelled"]).default("in_progress").notNull(),
   chiefComplaint: text("chiefComplaint"),
+  specialty: varchar("specialty", { length: 128 }),
   transcription: text("transcription"),
   // Audio is never stored permanently — only transient processing
   audioProcessed: boolean("audioProcessed").default(false).notNull(),
@@ -164,3 +165,29 @@ export const subscriptions = mysqlTable("subscriptions", {
 
 export type Subscription = typeof subscriptions.$inferSelect;
 export type InsertSubscription = typeof subscriptions.$inferInsert;
+
+// ─── Patient Problems (Lista de Problemas Assistida por IA) ──────────────────────────────
+export const patientProblems = mysqlTable("patient_problems", {
+  id: int("id").autoincrement().primaryKey(),
+  patientId: int("patientId").notNull(),
+  doctorId: int("doctorId").notNull(),
+  // Problema identificado
+  title: varchar("title", { length: 256 }).notNull(),
+  description: text("description"),
+  // Status do problema
+  status: mysqlEnum("status", ["active", "controlled", "resolved", "monitoring"])
+    .default("active")
+    .notNull(),
+  // Especialidade que identificou o problema
+  identifiedBySpecialty: varchar("identifiedBySpecialty", { length: 128 }),
+  // Primeira e última consulta onde apareceu
+  firstSeenConsultationId: int("firstSeenConsultationId"),
+  lastSeenConsultationId: int("lastSeenConsultationId"),
+  // Número sequencial do problema para este paciente (P1, P2, P3...)
+  problemNumber: int("problemNumber").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type PatientProblem = typeof patientProblems.$inferSelect;
+export type InsertPatientProblem = typeof patientProblems.$inferInsert;

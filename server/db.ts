@@ -10,8 +10,10 @@ import {
   InsertConsultation,
   InsertExamUpload,
   InsertPatient,
+  InsertPatientProblem,
   InsertSoapNote,
   InsertUser,
+  patientProblems,
   patients,
   soapNotes,
   users,
@@ -71,6 +73,13 @@ export async function getUserByOpenId(openId: string) {
   const db = await getDb();
   if (!db) return undefined;
   const result = await db.select().from(users).where(eq(users.openId, openId)).limit(1);
+  return result[0] ?? undefined;
+}
+
+export async function getUserById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(users).where(eq(users.id, id)).limit(1);
   return result[0] ?? undefined;
 }
 
@@ -299,4 +308,37 @@ export async function getChatMessagesByConsultation(consultationId: number) {
     .from(chatMessages)
     .where(eq(chatMessages.consultationId, consultationId))
     .orderBy(chatMessages.createdAt);
+}
+
+// ─── Patient Problems ───────────────────────────────────────────────────────────────────────────────────
+export async function getProblemsByPatient(patientId: number, doctorId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db
+    .select()
+    .from(patientProblems)
+    .where(and(eq(patientProblems.patientId, patientId), eq(patientProblems.doctorId, doctorId)))
+    .orderBy(patientProblems.problemNumber);
+}
+
+export async function upsertPatientProblem(data: InsertPatientProblem & { id?: number }) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  if (data.id) {
+    const { id, ...updateData } = data;
+    await db.update(patientProblems).set(updateData).where(eq(patientProblems.id, id));
+    return { id };
+  }
+  const [result] = await db.insert(patientProblems).values(data).$returningId();
+  return result;
+}
+
+export async function getNextProblemNumber(patientId: number, doctorId: number): Promise<number> {
+  const db = await getDb();
+  if (!db) return 1;
+  const problems = await db
+    .select()
+    .from(patientProblems)
+    .where(and(eq(patientProblems.patientId, patientId), eq(patientProblems.doctorId, doctorId)));
+  return problems.length + 1;
 }

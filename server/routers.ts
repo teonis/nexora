@@ -15,13 +15,17 @@ import {
   getExamsByPatient,
   getPatientById,
   getPatientsByDoctor,
+  getNextProblemNumber,
+  getProblemsByPatient,
   getSoapNoteByConsultation,
   getTodayConsultations,
+  getUserById,
   updateConsultation,
   updateClinicalDocument,
   updateExamUpload,
   updatePatient,
   updateUserProfile,
+  upsertPatientProblem,
   upsertSoapNote,
 } from "./db";
 import { invokeLLM, type Message } from "./_core/llm";
@@ -142,12 +146,17 @@ const consultationsRouter = router({
     }),
 
   create: protectedProcedure
-    .input(z.object({ patientId: z.number(), chiefComplaint: z.string().optional() }))
+    .input(z.object({
+      patientId: z.number(),
+      chiefComplaint: z.string().optional(),
+      specialty: z.string().optional(),
+    }))
     .mutation(async ({ ctx, input }) => {
       const result = await createConsultation({
         patientId: input.patientId,
         doctorId: ctx.user.id,
         chiefComplaint: input.chiefComplaint,
+        specialty: input.specialty,
         status: "in_progress",
       });
       return result;
@@ -184,18 +193,53 @@ const consultationsRouter = router({
       if (!consultation) throw new TRPCError({ code: "NOT_FOUND" });
       if (!consultation.transcription) throw new TRPCError({ code: "BAD_REQUEST", message: "Sem transcrição disponível" });
 
+      // Detectar especialidade: consulta > perfil do médico > fallback
+      const doctor = await getUserById(ctx.user.id);
+      const specialty = consultation.specialty || doctor?.specialty || "clínica geral";
+
+      // Mapa de instruções específicas por especialidade
+      // Normalizar: remover acentos e espaços extras para match robusto
+      const normalizeKey = (s: string) =>
+        s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+
+      const specialtyInstructions: Record<string, string> = {
+        endocrinologia: `Foque em: glicemia, HbA1c, TSH, T4 livre, peso, IMC, histórico de DM, hipotireoidismo/hipertireoidismo, síndrome metabólica, ajuste de doses de insulina ou levotiroxina. Inclua valores de referência quando relevante.`,
+        nutrologia: `Foque em: peso atual, IMC, composição corporal, hábitos alimentares, ingestão hídrica, atividade física, carências nutricionais, suplementação, recordatório alimentar mencionado. Seja detalhado no Plano nutricional.`,
+        ginecologia: `Foque em: ciclo menstrual (regularidade, DUM), uso de anticoncepcional, histórico gestacional (G_P_A), queixas ginecológicas, exames preventivos (Papanicolau, mamografia), sintomas hormonais. Inclua data da DUM quando mencionada.`,
+        dermatologia: `Foque em: localização, morfologia e evolução das lesões cutâneas, fototipo, uso de protetor solar, histórico de lesões prévias, resposta a tratamentos anteriores. Descreva lesões com vocabulário dermatológico preciso (mácula, pápula, placa, etc.).`,
+        cardiologia: `Foque em: PA, FC, queixas cardíacas (dispneia, palpitações, dor torácica), fatores de risco cardiovascular, medicações em uso, resultados de ECG ou ecocardiograma se mencionados.`,
+        // com e sem acento (clinica geral / clínica geral)
+        "clinica geral": `Avalie todos os sistemas relevantes mencionados. Seja abrangente e objetivo.`,
+        // com e sem acento (medicina de familia / medicina de família)
+        "medicina de familia": `Avalie todos os sistemas relevantes mencionados. Considere contexto familiar e social quando mencionado.`,
+        pediatria: `Foque em: idade, peso, altura, desenvolvimento neuropsicomotor, vacinação, aleitamento, queixas pediátricas específicas. Use linguagem adequada à faixa etária.`,
+        ortopedia: `Foque em: localização da dor, mecanismo de lesão, limitação funcional, exame físico ortopédico (amplitude de movimento, testes específicos), achados de imagem se mencionados.`,
+        psiquiatria: `Foque em: humor, afeto, pensamento, percepção, cognição, comportamento, risco de auto/heteroagressão, medicações psicotrópicas em uso, histórico de internações.`,
+        neurologia: `Foque em: queixas neurológicas (cefaleia, tontura, déficit motor/sensitivo, convulsões), exame neurológico, achados de neuroimagem se mencionados.`,
+      };
+
+      const specialtyKey = normalizeKey(specialty);
+      const specialtyInstruction = specialtyInstructions[specialtyKey] || specialtyInstructions["clinica geral"];
+
       const response = await invokeLLM({
         messages: [
           {
             role: "system",
-            content: `Você é um assistente médico especializado em documentação clínica. 
+            content: `Você é um assistente médico especializado em documentação clínica para ${specialty}.
 Analise a transcrição de consulta médica e gere uma nota clínica estruturada no formato SOAP em português brasileiro.
-Seja preciso, objetivo e use terminologia médica adequada.
-Retorne APENAS o JSON estruturado, sem texto adicional.`,
+
+ORIENTAÇÕES ESPECÍFICAS PARA ${specialty.toUpperCase()}:
+${specialtyInstruction}
+
+Regras gerais:
+- Use terminologia médica adequada para ${specialty}
+- Seja preciso e objetivo
+- Se um dado não foi mencionado na consulta, escreva "Não referido" — nunca invente informações
+- Retorne APENAS o JSON estruturado, sem texto adicional`,
           },
           {
             role: "user",
-            content: `Transcrição da consulta:\n\n${consultation.transcription}\n\nGere a nota SOAP estruturada.`,
+            content: `Especialidade desta consulta: ${specialty}\n\nTranscrição da consulta:\n\n${consultation.transcription}\n\nGere a nota SOAP estruturada.`,
           },
         ],
         response_format: {
@@ -208,7 +252,7 @@ Retorne APENAS o JSON estruturado, sem texto adicional.`,
               properties: {
                 subjective: { type: "string", description: "Queixa principal, história da doença atual, medicamentos, alergias, histórico familiar" },
                 objective: { type: "string", description: "Sinais vitais, achados do exame físico, resultados de testes" },
-                assessment: { type: "string", description: "Diagnóstico(s) presumido(s), diagnóstico diferencial" },
+                assessment: { type: "string", description: "Diagnóstico(s) presumido(s), diagnóstico diferencial, CID-10 quando aplicável" },
                 plan: { type: "string", description: "Prescrições, pedidos de exames, encaminhamentos, orientações ao paciente" },
                 fullNote: { type: "string", description: "Nota clínica completa formatada para prontuário" },
               },
@@ -231,6 +275,11 @@ Retorne APENAS o JSON estruturado, sem texto adicional.`,
         doctorId: ctx.user.id,
         ...soapData,
       });
+
+      // Extração automática de problemas em background (não bloqueia o retorno)
+      extractProblemsBackground(input.consultationId, consultation, soapData, ctx.user.id).catch(
+        (err) => console.error("[Problems] Erro na extração automática:", err)
+      );
 
       return soapData;
     }),
@@ -367,6 +416,48 @@ Inclua no rodapé: "Este documento foi gerado com auxílio de IA (Clari) e revis
     .mutation(async ({ ctx, input }) => {
       await updateClinicalDocument(input.id, { content: input.content });
       return { success: true };
+    }),
+
+  exportPdf: protectedProcedure
+    .input(z.object({ documentId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      // Usar query direta para buscar por ID
+      const { getDb } = await import("./db");
+      const { clinicalDocuments } = await import("../drizzle/schema");
+      const { eq, and } = await import("drizzle-orm");
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+
+      const docRows = await db
+        .select()
+        .from(clinicalDocuments)
+        .where(and(eq(clinicalDocuments.id, input.documentId), eq(clinicalDocuments.doctorId, ctx.user.id)))
+        .limit(1);
+
+      const doc = docRows[0];
+      if (!doc) throw new TRPCError({ code: "NOT_FOUND" });
+
+      const patient = await getPatientById(doc.patientId, ctx.user.id);
+      const doctor = await getUserById(ctx.user.id);
+      if (!patient || !doctor) throw new TRPCError({ code: "NOT_FOUND" });
+
+      const { generateClinicalPdf } = await import("./_core/pdfGenerator");
+
+      const pdfBuffer = await generateClinicalPdf({
+        doctorName: doctor.name || "Médico",
+        doctorCrm: doctor.crm || "Não informado",
+        doctorSpecialty: doctor.specialty || undefined,
+        patientName: patient.fullName,
+        patientDob: patient.dateOfBirth || undefined,
+        documentTitle: doc.title,
+        documentContent: doc.content,
+        generatedAt: new Date(),
+      });
+
+      return {
+        base64: pdfBuffer.toString("base64"),
+        filename: `${doc.title.replace(/[^a-zA-Z0-9à-ü]/g, "_")}.pdf`,
+      };
     }),
 });
 
@@ -573,9 +664,178 @@ const contactRouter = router({
       const ok = await notifyOwner({ title: `[NEXORA Contato] ${input.subject}`, content });
       return { success: ok };
     }),
+});// ─── Helper: Extração de Problemas em Background ─────────────────────────────────────────────────────────────────────────────────
+async function extractProblemsBackground(
+  consultationId: number,
+  consultation: { patientId: number; specialty?: string | null },
+  soap: { subjective?: string; objective?: string; assessment?: string; plan?: string },
+  doctorId: number
+) {
+  const existingProblems = await getProblemsByPatient(consultation.patientId, doctorId);
+  const existingList =
+    existingProblems.length > 0
+      ? existingProblems.map((p) => `P${p.problemNumber}: ${p.title} (${p.status})`).join("\n")
+      : "Nenhum problema cadastrado ainda.";
+
+  const response = await invokeLLM({
+    messages: [
+      {
+        role: "system",
+        content: `Você é um assistente clínico especializado em organização de prontuários médicos.
+Analise a nota SOAP e identifique os problemas/diagnósticos clínicos relevantes.
+
+Problemas já registrados para este paciente:
+${existingList}
+
+REGRAS:
+1. Se o problema já existe na lista acima (mesmo que com palavras diferentes), retorne com isnew: false e o id do problema existente mais parecido
+2. Se é um problema genuinamente novo, retorne com isnew: true
+3. Ignore achados transitórios sem significado clínico (ex: "cefaleia leve isolada")
+4. Máximo de 5 problemas por consulta
+5. Retorne APENAS JSON, sem texto adicional`,
+      },
+      {
+        role: "user",
+        content: `Especialidade: ${consultation.specialty || "não informada"}\n\nSOAP desta consulta:\nSubjetivo: ${soap.subjective ?? ""}\nObjetivo: ${soap.objective ?? ""}\nAvaliação: ${soap.assessment ?? ""}\nPlano: ${soap.plan ?? ""}\n\nExtraia os problemas clínicos relevantes.`,
+      },
+    ],
+    response_format: {
+      type: "json_schema",
+      json_schema: {
+        name: "problems_extraction",
+        strict: true,
+        schema: {
+          type: "object",
+          properties: {
+            problems: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  title: { type: "string", description: "Nome do problema/diagnóstico, conciso" },
+                  description: { type: "string", description: "Breve contexto clínico desta consulta" },
+                  status: { type: "string", enum: ["active", "controlled", "resolved", "monitoring"] },
+                  isnew: { type: "boolean" },
+                  existingId: { type: "number", description: "ID do problema existente se isnew=false, ou 0 se novo" },
+                },
+                required: ["title", "description", "status", "isnew", "existingId"],
+                additionalProperties: false,
+              },
+            },
+          },
+          required: ["problems"],
+          additionalProperties: false,
+        },
+      },
+    },
+  });
+
+  const rawContent = response.choices[0]?.message?.content;
+  const content = typeof rawContent === "string" ? rawContent : null;
+  if (!content) return;
+
+  const { problems } = JSON.parse(content) as {
+    problems: Array<{ title: string; description: string; status: "active" | "controlled" | "resolved" | "monitoring"; isnew: boolean; existingId: number }>;
+  };
+
+  for (const problem of problems) {
+    if (problem.isnew) {
+      const problemNumber = await getNextProblemNumber(consultation.patientId, doctorId);
+      await upsertPatientProblem({
+        patientId: consultation.patientId,
+        doctorId,
+        title: problem.title,
+        description: problem.description,
+        status: problem.status,
+        identifiedBySpecialty: consultation.specialty ?? undefined,
+        firstSeenConsultationId: consultationId,
+        lastSeenConsultationId: consultationId,
+        problemNumber,
+      });
+    } else if (problem.existingId > 0) {
+      const existing = existingProblems.find((p) => p.id === problem.existingId);
+      if (existing) {
+        await upsertPatientProblem({
+          id: problem.existingId,
+          patientId: consultation.patientId,
+          doctorId,
+          title: existing.title,
+          description: problem.description,
+          status: problem.status,
+          lastSeenConsultationId: consultationId,
+          problemNumber: existing.problemNumber,
+        });
+      }
+    }
+  }
+}
+
+// ─── Problems Router ───────────────────────────────────────────────────────────────────────────────────
+const problemsRouter = router({
+  byPatient: protectedProcedure
+    .input(z.object({ patientId: z.number() }))
+    .query(async ({ ctx, input }) => {
+      return getProblemsByPatient(input.patientId, ctx.user.id);
+    }),
+
+  update: protectedProcedure
+    .input(
+      z.object({
+        id: z.number(),
+        status: z.enum(["active", "controlled", "resolved", "monitoring"]).optional(),
+        description: z.string().optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      // Buscar o problema existente para garantir que pertence ao médico
+      const { getDb } = await import("./db");
+      const { patientProblems: pp } = await import("../drizzle/schema");
+      const { eq, and } = await import("drizzle-orm");
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+
+      const rows = await db
+        .select()
+        .from(pp)
+        .where(and(eq(pp.id, input.id), eq(pp.doctorId, ctx.user.id)))
+        .limit(1);
+
+      const problem = rows[0];
+      if (!problem) throw new TRPCError({ code: "NOT_FOUND", message: "Problema não encontrado" });
+
+      // Atualizar apenas os campos enviados
+      const updateData: Record<string, unknown> = {};
+      if (input.status !== undefined) updateData.status = input.status;
+      if (input.description !== undefined) updateData.description = input.description;
+
+      await db.update(pp).set(updateData).where(eq(pp.id, input.id));
+      return { success: true };
+    }),
+
+  extractFromSoap: protectedProcedure
+    .input(z.object({ consultationId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const consultation = await getConsultationById(input.consultationId, ctx.user.id);
+      if (!consultation) throw new TRPCError({ code: "NOT_FOUND" });
+      const soap = await getSoapNoteByConsultation(input.consultationId);
+      if (!soap) throw new TRPCError({ code: "BAD_REQUEST", message: "SOAP não gerado ainda" });
+      await extractProblemsBackground(
+        input.consultationId,
+        consultation,
+        {
+          subjective: soap.subjective ?? undefined,
+          objective: soap.objective ?? undefined,
+          assessment: soap.assessment ?? undefined,
+          plan: soap.plan ?? undefined,
+        },
+        ctx.user.id
+      );
+      const problems = await getProblemsByPatient(consultation.patientId, ctx.user.id);
+      return { extracted: problems.length, problems };
+    }),
 });
 
-// ─── App Router ────────────────────────────────────────────────────────────────────────────────
+// ─── App Router ───────────────────────────────────────────────────────────────────────────────────
 export const appRouter = router({
   system: systemRouter,
   auth: authRouter,
@@ -587,5 +847,6 @@ export const appRouter = router({
   dashboard: dashboardRouter,
   contact: contactRouter,
   stripe: stripeRouter,
+  problems: problemsRouter,
 });
 export type AppRouter = typeof appRouter;

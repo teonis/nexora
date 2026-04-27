@@ -3,17 +3,51 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
+import { useAuth } from "@/_core/hooks/useAuth";
 import { ArrowLeft, ArrowRight, Search, Stethoscope, User } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useLocation } from "wouter";
 import { toast } from "sonner";
+
+const SPECIALTIES = [
+  { value: "endocrinologia", label: "Endocrinologia" },
+  { value: "nutrologia", label: "Nutrologia" },
+  { value: "ginecologia", label: "Ginecologia" },
+  { value: "dermatologia", label: "Dermatologia" },
+  { value: "cardiologia", label: "Cardiologia" },
+  { value: "clinica geral", label: "Clínica Geral" },
+  { value: "medicina de familia", label: "Medicina de Família" },
+  { value: "pediatria", label: "Pediatria" },
+  { value: "ortopedia", label: "Ortopedia" },
+  { value: "psiquiatria", label: "Psiquiatria" },
+  { value: "neurologia", label: "Neurologia" },
+];
 
 export default function Consultation() {
   const [, navigate] = useLocation();
   const [search, setSearch] = useState("");
   const [selectedPatientId, setSelectedPatientId] = useState<number | null>(null);
   const [chiefComplaint, setChiefComplaint] = useState("");
+  const { user } = useAuth();
+
+  // Normalizar string para comparar sem acentos
+  const normalizeStr = (s: string) =>
+    s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+
+  // Usar a especialidade do perfil do médico como valor padrão
+  const defaultSpecialty = useMemo(() => {
+    if (!user?.specialty) return "";
+    const normalized = normalizeStr(user.specialty);
+    const match = SPECIALTIES.find(
+      (s) => normalizeStr(s.value) === normalized || normalizeStr(s.label) === normalized
+    );
+    return match?.value ?? "";
+  }, [user?.specialty]);
+
+  const [specialty, setSpecialty] = useState("");
+  const effectiveSpecialty = specialty || defaultSpecialty;
 
   const { data: patients } = trpc.patients.list.useQuery({ search: search || undefined });
   const selectedPatient = patients?.find((p) => p.id === selectedPatientId);
@@ -30,7 +64,11 @@ export default function Consultation() {
       toast.error("Selecione um paciente para iniciar a consulta");
       return;
     }
-    createConsultation.mutate({ patientId: selectedPatientId, chiefComplaint });
+    createConsultation.mutate({
+      patientId: selectedPatientId,
+      chiefComplaint,
+      specialty: effectiveSpecialty || undefined,
+    });
   };
 
   return (
@@ -117,9 +155,34 @@ export default function Consultation() {
           )}
         </div>
 
+        {/* Specialty selector */}
+        <div className="bg-card border border-border rounded-xl p-5 space-y-3">
+          <h3 className="text-sm font-semibold text-foreground">2. Especialidade</h3>
+          <div className="space-y-1.5">
+            <Label htmlFor="specialty" className="text-xs text-muted-foreground">
+              Especialidade desta consulta
+              {defaultSpecialty && !specialty && (
+                <span className="ml-1 text-primary">(padrão do perfil)</span>
+              )}
+            </Label>
+            <Select value={effectiveSpecialty} onValueChange={setSpecialty}>
+              <SelectTrigger id="specialty">
+                <SelectValue placeholder="Selecione a especialidade..." />
+              </SelectTrigger>
+              <SelectContent>
+                {SPECIALTIES.map((s) => (
+                  <SelectItem key={s.value} value={s.value}>
+                    {s.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
         {/* Chief complaint */}
         <div className="bg-card border border-border rounded-xl p-5 space-y-3">
-          <h3 className="text-sm font-semibold text-foreground">2. Queixa Principal (opcional)</h3>
+          <h3 className="text-sm font-semibold text-foreground">3. Queixa Principal (opcional)</h3>
           <div className="space-y-1.5">
             <Label htmlFor="complaint" className="text-xs text-muted-foreground">
               Descreva brevemente o motivo da consulta

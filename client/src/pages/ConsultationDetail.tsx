@@ -1,4 +1,5 @@
 import ClinicalLayout from "@/components/ClinicalLayout";
+import ProblemList from "@/components/ProblemList";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
@@ -101,6 +102,25 @@ export default function ConsultationDetail() {
   });
 
   const updateTranscriptionMutation = trpc.consultations.updateTranscription.useMutation();
+
+  const exportPdfMutation = trpc.documents.exportPdf.useMutation({
+    onSuccess: (data) => {
+      // Fazer download do PDF gerado pelo servidor
+      const byteChars = atob(data.base64);
+      const byteNumbers = new Array(byteChars.length);
+      for (let i = 0; i < byteChars.length; i++) byteNumbers[i] = byteChars.charCodeAt(i);
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: "application/pdf" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = data.filename;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success("PDF gerado com sucesso!");
+    },
+    onError: (err) => toast.error("Erro ao gerar PDF: " + err.message),
+  });
 
   // Upload audio to storage then transcribe
   const uploadAndTranscribe = useCallback(async (audioBlob: Blob) => {
@@ -219,6 +239,11 @@ export default function ConsultationDetail() {
             <CheckCircle className="w-4 h-4 text-green-600" />
             <p className="text-sm text-green-800 font-medium">Consulta concluída</p>
           </div>
+        )}
+
+        {/* Problemas ativos do paciente — contexto para o médico */}
+        {consultation.patientId && (
+          <ProblemList patientId={consultation.patientId} compact />
         )}
 
         {/* LGPD notice */}
@@ -510,16 +535,14 @@ export default function ConsultationDetail() {
                           size="sm"
                           variant="outline"
                           className="text-xs"
-                          onClick={() => {
-                            const printWindow = window.open("", "_blank");
-                            if (printWindow) {
-                              printWindow.document.write(`<html><head><title>${doc.title}</title><style>body{font-family:Arial,sans-serif;padding:40px;max-width:800px;margin:0 auto;line-height:1.6}h1{font-size:18px;margin-bottom:20px}pre{white-space:pre-wrap;font-family:inherit}</style></head><body><h1>${doc.title}</h1><pre>${doc.content}</pre></body></html>`);
-                              printWindow.document.close();
-                              printWindow.print();
-                            }
-                          }}
+                          disabled={exportPdfMutation.isPending}
+                          onClick={() => exportPdfMutation.mutate({ documentId: doc.id })}
                         >
-                          Imprimir / PDF
+                          {exportPdfMutation.isPending ? (
+                            <><Loader2 className="w-3 h-3 mr-1 animate-spin" />Gerando PDF...</>
+                          ) : (
+                            "Exportar PDF"
+                          )}
                         </Button>
                       </div>
                     </div>

@@ -1,0 +1,1 @@
+ALTER TABLE `consultations` ADD `specialty` varchar(128);

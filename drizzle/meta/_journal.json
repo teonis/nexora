@@ -22,6 +22,20 @@
       "when": 1777259031407,
       "tag": "0002_dashing_tomorrow_man",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1777291289310,
+      "tag": "0003_shallow_brood",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1777291745952,
+      "tag": "0004_needy_namor",
+      "breakpoints": true
     }
   ]
 }

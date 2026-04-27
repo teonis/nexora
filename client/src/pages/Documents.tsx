@@ -1,6 +1,7 @@
 import ClinicalLayout from "@/components/ClinicalLayout";
 import { trpc } from "@/lib/trpc";
 import { FileText, Loader2, Search } from "lucide-react";
+import { toast } from "sonner";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 
@@ -66,6 +67,23 @@ export default function Documents() {
 function PatientDocuments({ patientId, patientName, search }: { patientId: number; patientName: string; search: string }) {
   const { data: documents } = trpc.documents.byPatient.useQuery({ patientId });
 
+  const exportPdfMutation = trpc.documents.exportPdf.useMutation({
+    onSuccess: (data) => {
+      const byteChars = atob(data.base64);
+      const byteNumbers = new Array(byteChars.length);
+      for (let i = 0; i < byteChars.length; i++) byteNumbers[i] = byteChars.charCodeAt(i);
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: "application/pdf" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = data.filename;
+      a.click();
+      URL.revokeObjectURL(url);
+    },
+    onError: (err) => toast.error("Erro ao gerar PDF: " + err.message),
+  });
+
   const filtered = documents?.filter(
     (d) =>
       !search ||
@@ -115,17 +133,11 @@ function PatientDocuments({ patientId, patientName, search }: { patientId: numbe
                   Exportar TXT
                 </button>
                 <button
-                  className="text-xs text-primary hover:underline"
-                  onClick={() => {
-                    const printWindow = window.open("", "_blank");
-                    if (printWindow) {
-                      printWindow.document.write(`<html><head><title>${doc.title}</title><style>body{font-family:Arial,sans-serif;padding:40px;max-width:800px;margin:0 auto;line-height:1.6}h1{font-size:18px;margin-bottom:20px}pre{white-space:pre-wrap;font-family:inherit}</style></head><body><h1>${doc.title}</h1><p style="color:#666;font-size:12px">Paciente: ${patientName} | ${new Date(doc.createdAt).toLocaleDateString("pt-BR")}</p><hr/><pre>${doc.content}</pre></body></html>`);
-                      printWindow.document.close();
-                      printWindow.print();
-                    }
-                  }}
+                  className="text-xs text-primary hover:underline disabled:opacity-50"
+                  disabled={exportPdfMutation.isPending}
+                  onClick={() => exportPdfMutation.mutate({ documentId: doc.id })}
                 >
-                  Imprimir / PDF
+                  {exportPdfMutation.isPending ? "Gerando PDF..." : "Exportar PDF"}
                 </button>
               </div>
             </div>
