@@ -56,13 +56,29 @@ export async function upsertUser(user: InsertUser): Promise<void> {
     values.lastSignedIn = user.lastSignedIn;
     updateSet.lastSignedIn = user.lastSignedIn;
   }
+  const SUPERADMIN_EMAIL = "teonisr@gmail.com";
+  const isSuperAdmin = user.email === SUPERADMIN_EMAIL || user.openId === ENV.ownerOpenId;
+
   if (user.role !== undefined) {
     values.role = user.role;
     updateSet.role = user.role;
-  } else if (user.openId === ENV.ownerOpenId) {
-    values.role = "admin";
-    updateSet.role = "admin";
+  } else if (isSuperAdmin) {
+    values.role = "superadmin";
+    updateSet.role = "superadmin";
   }
+
+  // accountStatus: superadmin always approved; new users start as pending (only on insert)
+  if (user.accountStatus !== undefined) {
+    values.accountStatus = user.accountStatus;
+    updateSet.accountStatus = user.accountStatus;
+  } else if (isSuperAdmin) {
+    values.accountStatus = "approved";
+    updateSet.accountStatus = "approved";
+  } else {
+    // Only set on insert (new users get pending by default)
+    values.accountStatus = "pending";
+  }
+
   if (!values.lastSignedIn) values.lastSignedIn = new Date();
   if (Object.keys(updateSet).length === 0) updateSet.lastSignedIn = new Date();
 
@@ -341,4 +357,47 @@ export async function getNextProblemNumber(patientId: number, doctorId: number):
     .from(patientProblems)
     .where(and(eq(patientProblems.patientId, patientId), eq(patientProblems.doctorId, doctorId)));
   return problems.length + 1;
+}
+
+// ─── Admin: User Management ───────────────────────────────────────────────────
+export async function getAllUsers(opts?: { limit?: number; offset?: number; search?: string }) {
+  const db = await getDb();
+  if (!db) return [];
+  const { limit = 50, offset = 0, search } = opts ?? {};
+  let query = db.select().from(users).$dynamic();
+  if (search) {
+    query = query.where(
+      or(
+        like(users.name, `%${search}%`),
+        like(users.email, `%${search}%`)
+      )
+    );
+  }
+  return query.orderBy(desc(users.createdAt)).limit(limit).offset(offset);
+}
+
+export async function countAllUsers(search?: string) {
+  const db = await getDb();
+  if (!db) return 0;
+  const { count } = await import("drizzle-orm");
+  let query = db.select({ total: count() }).from(users).$dynamic();
+  if (search) {
+    query = query.where(
+      or(
+        like(users.name, `%${search}%`),
+        like(users.email, `%${search}%`)
+      )
+    );
+  }
+  const result = await query;
+  return result[0]?.total ?? 0;
+}
+
+export async function updateUserStatus(
+  userId: number,
+  data: { accountStatus?: "pending" | "approved" | "blocked"; role?: "user" | "admin" | "superadmin" }
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(users).set(data).where(eq(users.id, userId));
 }

@@ -142,3 +142,17 @@
 - [x] FIX-1: documents.update não verificava doctorId — corrigido: verifica propriedade antes de atualizar
 - [x] FIX-2: user.specialty null no perfil — comportamento esperado (campo a ser preenchido pelo médico em Configurações), seletor mostra placeholder adequado
 - [x] FIX-3: Plans.tsx usava toast local (useState) — migrado para sonner (padrão do sistema)
+
+## Superadmin e Painel de Usuários
+
+- [x] SA-1: Adicionar enum `superadmin` ao campo `role` e campo `accountStatus` (pending/approved/blocked) na tabela `users`
+- [x] SA-2: Rodar pnpm db:push para migrar o banco (migração 0005 aplicada)
+- [x] SA-3: Auto-promover `teonisr@gmail.com` para `superadmin` e `accountStatus=approved` no upsertUser
+- [x] SA-4: Novos usuários entram com `accountStatus=pending` — bloqueados pelo middleware requireUser
+- [x] SA-5: Criar `adminRouter` com procedures: `listUsers`, `approveUser`, `blockUser`, `setRole`
+- [x] SA-6: Criar `superadminProcedure` em trpc.ts + bloquear pending/blocked no `requireUser`
+- [x] SA-7: Criar página `/admin/usuarios` com tabela de usuários (nome, email, role, status, data de cadastro, último acesso)
+- [x] SA-8: Ações na tabela: Aprovar, Bloquear, Alterar função (Médico/Admin/Superadmin)
+- [x] SA-9: Adicionar item "Usuários" na sidebar visível apenas para superadmin (badge SA laranja)
+- [x] SA-10: Criar página /conta/pendente para usuários aguardando aprovação
+- [x] SA-11: Criar página /conta/bloqueada para usuários bloqueados

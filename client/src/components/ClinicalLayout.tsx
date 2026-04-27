@@ -11,6 +11,7 @@ import {
   LogOut,
   Menu,
   Moon,
+  ShieldCheck,
   Stethoscope,
   Sun,
   Users,
@@ -200,6 +201,34 @@ export default function ClinicalLayout({ children, title, subtitle, actions }: C
               </Link>
             );
           })}
+
+          {/* Superadmin: Users panel */}
+          {user?.role === "superadmin" && (() => {
+            const href = "/admin/usuarios";
+            const isActive = location.startsWith(href);
+            return (
+              <>
+                <div className="mx-1 my-2 border-t border-sidebar-border" />
+                <Link
+                  href={href}
+                  onClick={() => setSidebarOpen(false)}
+                  className={cn(
+                    "relative flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150",
+                    isActive
+                      ? "bg-orange-500/10 text-orange-600 sidebar-active-bar"
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                  )}
+                >
+                  <ShieldCheck className={cn("w-4 h-4 flex-shrink-0", isActive ? "text-orange-600" : "")} />
+                  <span>Usuários</span>
+                  <span className={cn(
+                    "ml-auto text-[9px] font-semibold px-1.5 py-0.5 rounded-full",
+                    isActive ? "bg-orange-500/20 text-orange-600" : "bg-orange-500/10 text-orange-500/70"
+                  )}>SA</span>
+                </Link>
+              </>
+            );
+          })()}
         </nav>
 
         {/* Plan indicator */}

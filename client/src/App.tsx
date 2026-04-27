@@ -18,6 +18,9 @@ import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Contact from "./pages/Contact";
 import Plans from "./pages/Plans";
+import AdminUsers from "./pages/AdminUsers";
+import PendingApproval from "./pages/PendingApproval";
+import BlockedAccount from "./pages/BlockedAccount";
 
 function Router() {
   return (
@@ -36,6 +39,9 @@ function Router() {
       <Route path="/termos" component={Terms} />
       <Route path="/contato" component={Contact} />
       <Route path="/planos" component={Plans} />
+      <Route path="/admin/usuarios" component={AdminUsers} />
+      <Route path="/conta/pendente" component={PendingApproval} />
+      <Route path="/conta/bloqueada" component={BlockedAccount} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>

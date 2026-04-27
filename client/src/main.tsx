@@ -15,7 +15,17 @@ const redirectToLoginIfUnauthorized = (error: unknown) => {
   if (typeof window === "undefined") return;
 
   const isUnauthorized = error.message === UNAUTHED_ERR_MSG;
+  const isPending = error.message === "ACCOUNT_PENDING";
+  const isBlocked = error.message === "ACCOUNT_BLOCKED";
 
+  if (isPending && !window.location.pathname.startsWith("/conta/pendente")) {
+    window.location.href = "/conta/pendente";
+    return;
+  }
+  if (isBlocked && !window.location.pathname.startsWith("/conta/bloqueada")) {
+    window.location.href = "/conta/bloqueada";
+    return;
+  }
   if (!isUnauthorized) return;
 
   window.location.href = getLoginUrl();

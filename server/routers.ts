@@ -6,6 +6,8 @@ import {
   createConsultation,
   createExamUpload,
   createPatient,
+  getAllUsers,
+  countAllUsers,
   getChatMessagesByConsultation,
   getConsultationById,
   getConsultationsByDoctor,
@@ -25,6 +27,7 @@ import {
   updateExamUpload,
   updatePatient,
   updateUserProfile,
+  updateUserStatus,
   upsertPatientProblem,
   upsertSoapNote,
 } from "./db";
@@ -33,7 +36,7 @@ import { transcribeAudio } from "./_core/voiceTranscription";
 import { storagePut } from "./storage";
 import { systemRouter } from "./_core/systemRouter";
 import { stripeRouter } from "./stripeRouter";
-import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
+import { protectedProcedure, publicProcedure, superadminProcedure, router } from "./_core/trpc";
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 
@@ -848,6 +851,47 @@ const problemsRouter = router({
 });
 
 // ─── App Router ───────────────────────────────────────────────────────────────────────────────────
+// ─── Admin Router ─────────────────────────────────────────────────────────────
+const adminRouter = router({
+  listUsers: superadminProcedure
+    .input(z.object({
+      limit: z.number().min(1).max(100).default(50),
+      offset: z.number().min(0).default(0),
+      search: z.string().optional(),
+    }))
+    .query(async ({ input }) => {
+      const [users, total] = await Promise.all([
+        getAllUsers({ limit: input.limit, offset: input.offset, search: input.search }),
+        countAllUsers(input.search),
+      ]);
+      return { users, total };
+    }),
+
+  approveUser: superadminProcedure
+    .input(z.object({ userId: z.number() }))
+    .mutation(async ({ input }) => {
+      await updateUserStatus(input.userId, { accountStatus: "approved" });
+      return { success: true };
+    }),
+
+  blockUser: superadminProcedure
+    .input(z.object({ userId: z.number() }))
+    .mutation(async ({ input }) => {
+      await updateUserStatus(input.userId, { accountStatus: "blocked" });
+      return { success: true };
+    }),
+
+  setRole: superadminProcedure
+    .input(z.object({
+      userId: z.number(),
+      role: z.enum(["user", "admin", "superadmin"]),
+    }))
+    .mutation(async ({ input }) => {
+      await updateUserStatus(input.userId, { role: input.role });
+      return { success: true };
+    }),
+});
+
 export const appRouter = router({
   system: systemRouter,
   auth: authRouter,
@@ -860,5 +904,6 @@ export const appRouter = router({
   contact: contactRouter,
   stripe: stripeRouter,
   problems: problemsRouter,
+  admin: adminRouter,
 });
 export type AppRouter = typeof appRouter;
