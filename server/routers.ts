@@ -28,6 +28,7 @@ import { invokeLLM, type Message } from "./_core/llm";
 import { transcribeAudio } from "./_core/voiceTranscription";
 import { storagePut } from "./storage";
 import { systemRouter } from "./_core/systemRouter";
+import { stripeRouter } from "./stripeRouter";
 import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
@@ -585,4 +586,6 @@ export const appRouter = router({
   vita: vitaRouter,
   dashboard: dashboardRouter,
   contact: contactRouter,
-});export type AppRouter = typeof appRouter;
+  stripe: stripeRouter,
+});
+export type AppRouter = typeof appRouter;

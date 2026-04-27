@@ -966,6 +966,14 @@ export default function Home() {
             >
               Funcionalidades
             </a>
+            <a
+              href="/planos"
+              style={{ fontSize: 13, color: "#9CA3AF", textDecoration: "none", fontWeight: 400, transition: "color 0.15s" }}
+              onMouseEnter={e => (e.currentTarget.style.color = "#374151")}
+              onMouseLeave={e => (e.currentTarget.style.color = "#9CA3AF")}
+            >
+              Planos
+            </a>
             <button
               onClick={() => document.getElementById("clari")?.scrollIntoView({ behavior: "smooth" })}
               className="lp-nav-clari"

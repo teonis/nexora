@@ -2,8 +2,10 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { getLoginUrl } from "@/const";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/contexts/ThemeContext";
+import { trpc } from "@/lib/trpc";
 import {
   Bot,
+  CreditCard,
   FileText,
   Home,
   LogOut,
@@ -25,7 +27,14 @@ const navItems = [
   { href: "/consultation/new", label: "Nova Consulta", icon: Stethoscope },
   { href: "/clari", label: "Clari", icon: Bot, isAI: true },
   { href: "/documents", label: "Documentos", icon: FileText },
+  { href: "/planos", label: "Planos", icon: CreditCard },
 ];
+
+const PLAN_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
+  free: { label: "Gratuito", color: "#6B7280", bg: "#F3F4F6" },
+  pro: { label: "Pro", color: "#C9A646", bg: "#C9A64615" },
+  clinic: { label: "Clínica", color: "#7C3AED", bg: "#7C3AED15" },
+};
 
 interface ClinicalLayoutProps {
   children: React.ReactNode;
@@ -40,6 +49,11 @@ export default function ClinicalLayout({ children, title, subtitle, actions }: C
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { theme, toggleTheme, switchable } = useTheme();
   const [authTimeout, setAuthTimeout] = useState(false);
+
+  const { data: subStatus } = trpc.stripe.getSubscriptionStatus.useQuery(undefined, {
+    enabled: !!user && isAuthenticated,
+    staleTime: 5 * 60 * 1000, // 5 min cache
+  });
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -187,6 +201,42 @@ export default function ClinicalLayout({ children, title, subtitle, actions }: C
             );
           })}
         </nav>
+
+        {/* Plan indicator */}
+        {subStatus && (
+          <div className="mx-3 mb-2">
+            <Link
+              href="/planos"
+              className="flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-muted/50 transition-colors group"
+              style={{ textDecoration: "none" }}
+            >
+              <div className="flex items-center gap-2">
+                <div
+                  className="w-6 h-6 rounded-md flex items-center justify-center flex-shrink-0"
+                  style={{ background: PLAN_CONFIG[subStatus.plan]?.bg ?? "#F3F4F6" }}
+                >
+                  <CreditCard
+                    className="w-3 h-3"
+                    style={{ color: PLAN_CONFIG[subStatus.plan]?.color ?? "#6B7280" }}
+                  />
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-foreground leading-none">
+                    Plano{" "}
+                    <span style={{ color: PLAN_CONFIG[subStatus.plan]?.color ?? "#6B7280" }}>
+                      {PLAN_CONFIG[subStatus.plan]?.label ?? subStatus.plan}
+                    </span>
+                  </p>
+                  {subStatus.status === "active" && subStatus.plan !== "free" ? (
+                    <p className="text-[10px] text-muted-foreground mt-0.5">Ativo</p>
+                  ) : (
+                    <p className="text-[10px] text-primary mt-0.5 group-hover:underline">Fazer upgrade →</p>
+                  )}
+                </div>
+              </div>
+            </Link>
+          </div>
+        )}
 
         {/* AI Disclaimer */}
         <div className="mx-3 mb-3 p-3 rounded-lg bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20">

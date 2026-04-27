@@ -17,6 +17,7 @@ import Features from "./pages/Features";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Contact from "./pages/Contact";
+import Plans from "./pages/Plans";
 
 function Router() {
   return (
@@ -34,6 +35,7 @@ function Router() {
       <Route path="/privacidade" component={Privacy} />
       <Route path="/termos" component={Terms} />
       <Route path="/contato" component={Contact} />
+      <Route path="/planos" component={Plans} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>

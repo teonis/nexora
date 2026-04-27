@@ -15,6 +15,13 @@
       "when": 1777233687962,
       "tag": "0001_mixed_sheva_callister",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1777259031407,
+      "tag": "0002_dashing_tomorrow_man",
+      "breakpoints": true
     }
   ]
 }

@@ -91,3 +91,18 @@
 - [x] Criar página /contato com formulário de contato
 - [x] Adicionar Footer na landing page e na página de funcionalidades
 - [x] Registrar rotas das páginas legais no App.tsx
+
+## Integração Stripe (Pagamentos/Assinaturas)
+
+- [x] Adicionar feature Stripe via webdev_add_feature
+- [x] Configurar secrets STRIPE_SECRET_KEY e STRIPE_WEBHOOK_SECRET
+- [x] Adicionar tabela subscriptions no schema Drizzle
+- [x] Rodar pnpm db:push para migrar o banco
+- [x] Implementar router tRPC stripe: createCheckoutSession, createPortalSession, getSubscriptionStatus
+- [x] Registrar rota de webhook Stripe no servidor Express (antes do express.json)
+- [x] Criar página /planos com cards de preço (Gratuito, Pro, Clínica)
+- [x] Adicionar link "Planos" na navbar da landing page
+- [x] Registrar rota /planos no App.tsx
+- [x] Adicionar indicador de plano ativo na sidebar do ClinicalLayout
+- [x] Adicionar link Planos no navItems da sidebar
+- [x] Escrever testes unitários para routers Stripe (7 testes passando)
