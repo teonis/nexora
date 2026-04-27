@@ -5,7 +5,7 @@ function LegalLayout({ title, lastUpdated, children }: { title: string; lastUpda
     <div style={{ background: "#fff", color: "#111827", fontFamily: "Inter, system-ui, sans-serif", minHeight: "100vh" }}>
       <header style={{ borderBottom: "1px solid #F3F4F6", position: "sticky", top: 0, background: "#fff", zIndex: 50 }}>
         <div style={{ maxWidth: 720, margin: "0 auto", padding: "0 24px", height: 56, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <a href="/" style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.12em", color: "#111827", textDecoration: "none" }}>NEXORA</a>
+          <a href="/" style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.12em", color: "#111827", textDecoration: "none" }}>NEURIX</a>
           <a href="/" style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "#9CA3AF", textDecoration: "none", transition: "color 0.15s" }}
             onMouseEnter={e => (e.currentTarget.style.color = "#374151")}
             onMouseLeave={e => (e.currentTarget.style.color = "#9CA3AF")}>
@@ -23,7 +23,7 @@ function LegalLayout({ title, lastUpdated, children }: { title: string; lastUpda
       </main>
       <footer style={{ borderTop: "1px solid #F3F4F6" }}>
         <div style={{ maxWidth: 720, margin: "0 auto", padding: "24px", display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
-          <p style={{ fontSize: 11, color: "#D1D5DB", margin: 0 }}>© {new Date().getFullYear()} NEXORA. Todos os direitos reservados.</p>
+          <p style={{ fontSize: 11, color: "#D1D5DB", margin: 0 }}>© {new Date().getFullYear()} NEURIX. Todos os direitos reservados.</p>
           <div style={{ display: "flex", gap: 20 }}>
             <a href="/privacidade" style={{ fontSize: 11, color: "#D1D5DB", textDecoration: "none" }}>Privacidade</a>
             <a href="/termos" style={{ fontSize: 11, color: "#D1D5DB", textDecoration: "none" }}>Termos</a>
@@ -53,14 +53,14 @@ export default function Terms() {
     <LegalLayout title="Termos de Uso" lastUpdated="26 de abril de 2026">
       <Section title="1. Aceitação dos termos">
         <P>
-          Ao acessar ou utilizar a plataforma NEXORA, você concorda com estes Termos de Uso. Se não concordar com
+          Ao acessar ou utilizar a plataforma NEURIX, você concorda com estes Termos de Uso. Se não concordar com
           qualquer parte destes termos, não utilize a plataforma.
         </P>
       </Section>
 
       <Section title="2. Descrição do serviço">
         <P>
-          A NEXORA é uma plataforma de suporte à documentação clínica com inteligência artificial, destinada
+          A NEURIX é uma plataforma de suporte à documentação clínica com inteligência artificial, destinada
           exclusivamente a profissionais de saúde habilitados. A plataforma oferece recursos de transcrição de
           consultas, geração de notas clínicas estruturadas (formato SOAP) e assistência clínica por meio da Clari.
         </P>
@@ -68,7 +68,7 @@ export default function Terms() {
 
       <Section title="3. Uso responsável e limitações da IA">
         <P>
-          <strong>A Clari e todos os recursos de IA da NEXORA são ferramentas de suporte clínico.</strong> Eles não
+          <strong>A Clari e todos os recursos de IA da NEURIX são ferramentas de suporte clínico.</strong> Eles não
           substituem o julgamento clínico do profissional de saúde, nem devem ser utilizados como única base para
           diagnóstico, prescrição ou conduta médica. A responsabilidade pela decisão clínica é sempre e exclusivamente
           do profissional habilitado.
@@ -91,7 +91,7 @@ export default function Terms() {
       <Section title="5. Dados clínicos">
         <P>
           O usuário é o controlador dos dados clínicos inseridos na plataforma e é responsável por garantir que o
-          tratamento desses dados esteja em conformidade com a LGPD, o CFM e demais normas aplicáveis. A NEXORA
+          tratamento desses dados esteja em conformidade com a LGPD, o CFM e demais normas aplicáveis. A NEURIX
           atua como operadora dos dados, conforme definido na LGPD.
         </P>
       </Section>
@@ -99,7 +99,7 @@ export default function Terms() {
       <Section title="6. Propriedade intelectual">
         <P>
           Todos os elementos da plataforma — incluindo interface, código, marca e conteúdo — são propriedade da
-          NEXORA e protegidos por lei. É vedada a reprodução, distribuição ou engenharia reversa sem autorização
+          NEURIX e protegidos por lei. É vedada a reprodução, distribuição ou engenharia reversa sem autorização
           expressa.
         </P>
       </Section>

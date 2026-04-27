@@ -156,3 +156,11 @@
 - [x] SA-9: Adicionar item "Usuários" na sidebar visível apenas para superadmin (badge SA laranja)
 - [x] SA-10: Criar página /conta/pendente para usuários aguardando aprovação
 - [x] SA-11: Criar página /conta/bloqueada para usuários bloqueados
+
+## Renomeação NEXORA → NEURIX e Remoção do Charcot IA
+
+- [x] REN-1: Upload do novo logo NEURIX (/manus-storage/neurix-logo_11bade3c.png) — atualizar VITE_APP_TITLE e VITE_APP_LOGO em Configurações → Geral
+- [x] REN-2: Substituir NEXORA por NEURIX em todos os arquivos de frontend (15 arquivos, 42 ocorrências)
+- [x] REN-3: Substituir NEXORA por NEURIX em arquivos de backend (routers.ts, stripeProducts.ts, stripe.test.ts, index.html, index.css)
+- [x] REN-4: Remover todas as menções ao "Charcot IA" — substituido por "Clari IA" no schema.ts
+- [x] REN-5: TypeScript sem erros, 16 testes passando

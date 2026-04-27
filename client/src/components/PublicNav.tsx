@@ -32,7 +32,7 @@ export default function PublicNav() {
           <a href="/" style={{ textDecoration: "none", display: "flex", alignItems: "center" }}>
             <img
               src="/manus-storage/4_7e59f0e2.png"
-              alt="NEXORA"
+              alt="NEURIX"
               style={{ height: 28, objectFit: "contain" }}
             />
           </a>

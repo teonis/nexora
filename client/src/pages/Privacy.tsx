@@ -6,7 +6,7 @@ function LegalLayout({ title, lastUpdated, children }: { title: string; lastUpda
       {/* Nav */}
       <header style={{ borderBottom: "1px solid #F3F4F6", position: "sticky", top: 0, background: "#fff", zIndex: 50 }}>
         <div style={{ maxWidth: 720, margin: "0 auto", padding: "0 24px", height: 56, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <a href="/" style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.12em", color: "#111827", textDecoration: "none" }}>NEXORA</a>
+          <a href="/" style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.12em", color: "#111827", textDecoration: "none" }}>NEURIX</a>
           <a
             href="/"
             style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "#9CA3AF", textDecoration: "none", transition: "color 0.15s" }}
@@ -36,7 +36,7 @@ function LegalLayout({ title, lastUpdated, children }: { title: string; lastUpda
       {/* Footer */}
       <footer style={{ borderTop: "1px solid #F3F4F6" }}>
         <div style={{ maxWidth: 720, margin: "0 auto", padding: "24px", display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
-          <p style={{ fontSize: 11, color: "#D1D5DB", margin: 0 }}>© {new Date().getFullYear()} NEXORA. Todos os direitos reservados.</p>
+          <p style={{ fontSize: 11, color: "#D1D5DB", margin: 0 }}>© {new Date().getFullYear()} NEURIX. Todos os direitos reservados.</p>
           <div style={{ display: "flex", gap: 20 }}>
             <a href="/privacidade" style={{ fontSize: 11, color: "#D1D5DB", textDecoration: "none" }}>Privacidade</a>
             <a href="/termos" style={{ fontSize: 11, color: "#D1D5DB", textDecoration: "none" }}>Termos</a>
@@ -66,7 +66,7 @@ export default function Privacy() {
     <LegalLayout title="Política de Privacidade" lastUpdated="26 de abril de 2026">
       <Section title="1. Introdução">
         <P>
-          A NEXORA ("nós", "nosso" ou "Plataforma") está comprometida com a proteção dos seus dados pessoais e com a
+          A NEURIX ("nós", "nosso" ou "Plataforma") está comprometida com a proteção dos seus dados pessoais e com a
           conformidade com a Lei Geral de Proteção de Dados (LGPD — Lei nº 13.709/2018). Esta Política descreve como
           coletamos, usamos, armazenamos e protegemos as informações dos usuários da plataforma.
         </P>
@@ -119,7 +119,7 @@ export default function Privacy() {
         <P>
           Para dúvidas sobre esta política ou para exercer seus direitos, acesse nossa{" "}
           <a href="/contato" style={{ color: "#C9A646", textDecoration: "none" }}>página de contato</a> ou envie um
-          e-mail para <span style={{ color: "#374151" }}>privacidade@nexora.com.br</span>.
+          e-mail para <span style={{ color: "#374151" }}>privacidade@neurix.com.br</span>.
         </P>
       </Section>
     </LegalLayout>

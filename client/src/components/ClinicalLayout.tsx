@@ -122,7 +122,7 @@ export default function ClinicalLayout({ children, title, subtitle, actions }: C
 
           {/* Footer note */}
           <p className="text-xs text-muted-foreground/60 mt-8">
-            NEXORA · Plataforma Clínica com IA
+            NEURIX · Plataforma Clínica com IA
           </p>
         </div>
       </div>
@@ -152,11 +152,11 @@ export default function ClinicalLayout({ children, title, subtitle, actions }: C
           <div className="flex items-center gap-2.5">
             <img
               src="/manus-storage/2_19b7e141.png"
-              alt="NEXORA"
+              alt="NEURIX"
               className="w-8 h-8 object-contain flex-shrink-0"
             />
             <div>
-              <p className="text-sm font-bold text-sidebar-foreground leading-none" style={{ fontFamily: "'Sora', sans-serif", letterSpacing: "0.1em" }}>NEXORA</p>
+              <p className="text-sm font-bold text-sidebar-foreground leading-none" style={{ fontFamily: "'Sora', sans-serif", letterSpacing: "0.1em" }}>NEURIX</p>
               <p className="text-[10px] text-muted-foreground mt-0.5">Plataforma Clínica com IA</p>
             </div>
           </div>

@@ -676,7 +676,7 @@ const contactRouter = router({
         `Mensagem:`,
         input.message,
       ].join("\n");
-      const ok = await notifyOwner({ title: `[NEXORA Contato] ${input.subject}`, content });
+      const ok = await notifyOwner({ title: `[NEURIX Contato] ${input.subject}`, content });
       return { success: ok };
     }),
 });// ─── Helper: Extração de Problemas em Background ─────────────────────────────────────────────────────────────────────────────────

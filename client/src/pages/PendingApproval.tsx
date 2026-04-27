@@ -32,7 +32,7 @@ export default function PendingApproval() {
           <p className="text-sm font-medium text-amber-800">O que acontece agora?</p>
           <ul className="text-sm text-amber-700 space-y-1 list-disc list-inside">
             <li>O administrador revisará seu cadastro</li>
-            <li>Após aprovação, você terá acesso completo ao NEXORA</li>
+            <li>Após aprovação, você terá acesso completo ao NEURIX</li>
             <li>Em caso de dúvidas, entre em contato com o suporte</li>
           </ul>
         </div>

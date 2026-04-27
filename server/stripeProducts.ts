@@ -1,5 +1,5 @@
 /**
- * NEXORA — Planos de assinatura
+ * NEURIX — Planos de assinatura
  * Estes price IDs são criados no Stripe Dashboard (modo teste).
  * Em produção, substitua pelos price IDs reais via variável de ambiente.
  */
@@ -22,7 +22,7 @@ export const PLANS: PlanConfig[] = [
   {
     id: "free",
     name: "Gratuito",
-    description: "Para médicos que querem experimentar a NEXORA",
+    description: "Para médicos que querem experimentar a NEURIX",
     price: 0,
     priceLabel: "R$ 0",
     interval: null,

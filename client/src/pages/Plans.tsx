@@ -38,7 +38,7 @@ export default function Plans() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("success") === "true") {
-      toast.success("Assinatura ativada com sucesso! Bem-vindo ao NEXORA Pro.");
+      toast.success("Assinatura ativada com sucesso! Bem-vindo ao NEURIX Pro.");
       window.history.replaceState({}, "", "/planos");
     } else if (params.get("cancelled") === "true") {
       toast.info("Checkout cancelado. Você pode assinar a qualquer momento.");
@@ -336,7 +336,7 @@ export default function Plans() {
               },
               {
                 q: "Os dados dos pacientes são seguros?",
-                a: "Sim. A NEXORA é compatível com a LGPD. Os dados são criptografados em trânsito e em repouso. Áudios são deletados automaticamente após a transcrição.",
+                a: "Sim. A NEURIX é compatível com a LGPD. Os dados são criptografados em trânsito e em repouso. Áudios são deletados automaticamente após a transcrição.",
               },
               {
                 q: "Como testar o pagamento?",
@@ -358,7 +358,7 @@ export default function Plans() {
         display: "flex", justifyContent: "space-between", alignItems: "center",
         flexWrap: "wrap", gap: 12,
       }}>
-        <span style={{ color: "#9CA3AF", fontSize: 13 }}>© 2025 NEXORA. Todos os direitos reservados.</span>
+        <span style={{ color: "#9CA3AF", fontSize: 13 }}>© 2025 NEURIX. Todos os direitos reservados.</span>
         <div style={{ display: "flex", gap: 20 }}>
           {[
             { label: "Privacidade", href: "/privacidade" },

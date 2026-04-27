@@ -135,7 +135,7 @@ export const examUploads = mysqlTable("exam_uploads", {
 export type ExamUpload = typeof examUploads.$inferSelect;
 export type InsertExamUpload = typeof examUploads.$inferInsert;
 
-// ─── Chat Messages (Charcot IA) ───────────────────────────────────────────────
+// ─── Chat Messages (Clari IA) ────────────────────────────────────────────────
 export const chatMessages = mysqlTable("chat_messages", {
   id: int("id").autoincrement().primaryKey(),
   consultationId: int("consultationId").notNull(),

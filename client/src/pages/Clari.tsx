@@ -23,7 +23,7 @@ export default function Clari() {
             <div>
               <h2 className="text-base font-semibold text-foreground">Clari</h2>
               <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
-                O Clari é seu NEXORA contextual. Para aproveitar ao máximo, acesse-o diretamente durante uma consulta — ele terá acesso ao contexto do paciente, transcrição e nota SOAP para fornecer suporte mais preciso.
+                O Clari é seu NEURIX contextual. Para aproveitar ao máximo, acesse-o diretamente durante uma consulta — ele terá acesso ao contexto do paciente, transcrição e nota SOAP para fornecer suporte mais preciso.
               </p>
               <div className="mt-3 p-2.5 rounded-lg bg-amber-50 border border-amber-200">
                 <p className="text-xs text-amber-800">

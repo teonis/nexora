@@ -487,8 +487,8 @@ function AnimatedMockup({ isAuthenticated, loginUrl }: { isAuthenticated: boolea
               className="mockup-sidebar-title"
               style={{ marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}
             >
-              <img src="/manus-storage/2_19b7e141.png" alt="NEXORA" style={{ width: 18, height: 18, objectFit: "contain" }} />
-              <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.12em", color: "#111827" }}>NEXORA</span>
+              <img src="/manus-storage/2_19b7e141.png" alt="NEURIX" style={{ width: 18, height: 18, objectFit: "contain" }} />
+              <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.12em", color: "#111827" }}>NEURIX</span>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
               {STEPS.map((s, i) => {
@@ -985,7 +985,7 @@ export default function Home() {
             margin: "0 auto 48px",
             fontWeight: 400,
           }}>
-            A NEXORA organiza sua consulta enquanto ela acontece e apoia sua decisão clínica.
+            A NEURIX organiza sua consulta enquanto ela acontece e apoia sua decisão clínica.
           </p>
 
           {/* CTAs */}
@@ -1041,7 +1041,7 @@ export default function Home() {
             <span style={{ color: "#C9A646" }}>A consulta já sai pronta.</span>
           </h2>
           <p style={{ fontSize: 17, color: "#9CA3AF", lineHeight: 1.75, maxWidth: 440, margin: "0 auto" }}>
-            Enquanto você atende, a NEXORA transcreve, estrutura e organiza — sem interromper seu raciocínio.
+            Enquanto você atende, a NEURIX transcreve, estrutura e organiza — sem interromper seu raciocínio.
           </p>
         </FadeIn>
       </section>
@@ -1141,7 +1141,7 @@ export default function Home() {
           <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: 24 }}>
             {/* Brand */}
             <div>
-              <img src="/manus-storage/4_7e59f0e2.png" alt="NEXORA" style={{ height: 22, objectFit: "contain", marginBottom: 6 }} />
+              <img src="/manus-storage/4_7e59f0e2.png" alt="NEURIX" style={{ height: 22, objectFit: "contain", marginBottom: 6 }} />
               <p style={{ fontSize: 12, color: "#9CA3AF", marginTop: 4, maxWidth: 260, lineHeight: 1.6 }}>
                 Plataforma de inteligência clínica com IA para médicos.
               </p>
@@ -1189,7 +1189,7 @@ export default function Home() {
           {/* Bottom row */}
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
             <p style={{ fontSize: 11, color: "#D1D5DB", margin: 0 }}>
-              © {new Date().getFullYear()} NEXORA. Todos os direitos reservados.
+              © {new Date().getFullYear()} NEURIX. Todos os direitos reservados.
             </p>
             <p style={{ fontSize: 11, color: "#D1D5DB", margin: 0, textAlign: "right" }}>
               Clari é suporte clínico. A decisão médica é sempre do profissional.

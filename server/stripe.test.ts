@@ -62,7 +62,7 @@ function makeCtx(userId = 1): TrpcContext {
       id: userId,
       openId: "test_open_id",
       name: "Dr. Teste",
-      email: "teste@nexora.med.br",
+      email: "teste@neurix.med.br",
       role: "user",
       lastSignedIn: new Date(),
       createdAt: new Date(),
@@ -125,7 +125,7 @@ describe("stripeRouter – createCheckoutSession", () => {
     await expect(
       caller.stripe.createCheckoutSession({
         planId: "free" as never,
-        origin: "https://nexora.med.br",
+        origin: "https://neurix.med.br",
       })
     ).rejects.toThrow();
   });

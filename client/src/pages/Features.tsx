@@ -34,7 +34,7 @@ const FEATURES = [
     icon: Mic,
     label: "Transcrição",
     title: "Grave e transcreva em tempo real",
-    description: "Durante a consulta, a NEXORA captura o áudio e transcreve automaticamente usando a Whisper API. Nenhuma digitação necessária — o médico foca no paciente.",
+    description: "Durante a consulta, a NEURIX captura o áudio e transcreve automaticamente usando a Whisper API. Nenhuma digitação necessária — o médico foca no paciente.",
     detail: "O áudio é processado localmente e descartado imediatamente após a transcrição, em conformidade com a LGPD. A transcrição é precisa mesmo em ambientes com ruído.",
     tags: ["Whisper API", "Tempo real", "LGPD"],
     color: "#C9A646",
@@ -63,7 +63,7 @@ const FEATURES = [
     icon: ClipboardList,
     label: "Nota SOAP",
     title: "Documentação estruturada automaticamente",
-    description: "A partir da transcrição, a NEXORA gera automaticamente a nota clínica no formato SOAP — Subjetivo, Objetivo, Avaliação e Plano — pronta para revisão.",
+    description: "A partir da transcrição, a NEURIX gera automaticamente a nota clínica no formato SOAP — Subjetivo, Objetivo, Avaliação e Plano — pronta para revisão.",
     detail: "O médico pode revisar e editar cada campo antes de finalizar. O modelo de linguagem é calibrado para terminologia médica brasileira e boas práticas clínicas.",
     tags: ["LLM", "Formato SOAP", "Editável"],
     color: "#6366F1",
@@ -199,7 +199,7 @@ const FEATURES = [
     icon: Upload,
     label: "Exames",
     title: "Analise exames e laudos com IA",
-    description: "Envie PDFs ou imagens de exames anteriores. A NEXORA extrai os dados relevantes e os disponibiliza como contexto para a consulta e para a Clari.",
+    description: "Envie PDFs ou imagens de exames anteriores. A NEURIX extrai os dados relevantes e os disponibiliza como contexto para a consulta e para a Clari.",
     detail: "Suporte a hemograma, bioquímica, imagem, eletrocardiograma e laudos de qualquer especialidade. O arquivo original não é armazenado após o processamento.",
     tags: ["PDF", "Imagem", "Extração IA"],
     color: "#EC4899",
@@ -302,7 +302,7 @@ export default function Features() {
             <span style={{ color: "#C9A646" }}>Em um só lugar.</span>
           </h1>
           <p style={{ fontSize: "clamp(1rem, 2vw, 1.1rem)", color: "#9CA3AF", lineHeight: 1.75, maxWidth: 460, margin: "0 auto" }}>
-            Da gravação da consulta à exportação do documento — a NEXORA cobre todo o fluxo clínico com inteligência artificial.
+            Da gravação da consulta à exportação do documento — a NEURIX cobre todo o fluxo clínico com inteligência artificial.
           </p>
         </FadeIn>
       </section>
@@ -472,7 +472,7 @@ export default function Features() {
             Pronto para começar?
           </h2>
           <p style={{ fontSize: 16, color: "#9CA3AF", lineHeight: 1.75, maxWidth: 380, margin: "0 auto 40px" }}>
-            Experimente a NEXORA e veja sua consulta se transformar em documentação completa — automaticamente.
+            Experimente a NEURIX e veja sua consulta se transformar em documentação completa — automaticamente.
           </p>
           <a
             href={isAuthenticated ? "/dashboard" : getLoginUrl()}
@@ -495,7 +495,7 @@ export default function Features() {
         <div style={{ maxWidth: 1080, margin: "0 auto", padding: "40px 24px 32px", display: "flex", flexDirection: "column", gap: 24 }}>
           <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: 24 }}>
             <div>
-              <img src="/manus-storage/4_7e59f0e2.png" alt="NEXORA" style={{ height: 20, objectFit: "contain", marginBottom: 6 }} />
+              <img src="/manus-storage/4_7e59f0e2.png" alt="NEURIX" style={{ height: 20, objectFit: "contain", marginBottom: 6 }} />
               <p style={{ fontSize: 12, color: "#9CA3AF", marginTop: 4, maxWidth: 260, lineHeight: 1.6 }}>Plataforma de inteligência clínica com IA para médicos.</p>
             </div>
             <nav style={{ display: "flex", gap: 32, flexWrap: "wrap" }}>
@@ -514,7 +514,7 @@ export default function Features() {
           </div>
           <div style={{ borderTop: "1px solid #F3F4F6" }} />
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
-            <p style={{ fontSize: 11, color: "#D1D5DB", margin: 0 }}>© {new Date().getFullYear()} NEXORA. Todos os direitos reservados.</p>
+            <p style={{ fontSize: 11, color: "#D1D5DB", margin: 0 }}>© {new Date().getFullYear()} NEURIX. Todos os direitos reservados.</p>
             <p style={{ fontSize: 11, color: "#D1D5DB", margin: 0 }}>Clari é suporte clínico. A decisão médica é sempre do profissional.</p>
           </div>
         </div>

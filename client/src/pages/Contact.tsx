@@ -2,7 +2,7 @@ import { ArrowLeft, CheckCircle2, Mail, MessageSquare, Send } from "lucide-react
 import { useState, useCallback, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 
-const STORAGE_KEY = "nexora_contact_form";
+const STORAGE_KEY = "neurix_contact_form";
 
 // ─── Validation helpers ────────────────────────────────────────────────────────
 const validators = {
@@ -139,7 +139,7 @@ export default function Contact() {
       {/* Nav */}
       <header style={{ borderBottom: "1px solid #F3F4F6", position: "sticky", top: 0, background: "#fff", zIndex: 50 }}>
         <div style={{ maxWidth: 720, margin: "0 auto", padding: "0 24px", height: 56, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <a href="/" style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.12em", color: "#111827", textDecoration: "none" }}>NEXORA</a>
+          <a href="/" style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.12em", color: "#111827", textDecoration: "none" }}>NEURIX</a>
           <a href="/" style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "#9CA3AF", textDecoration: "none" }}
             onMouseEnter={e => (e.currentTarget.style.color = "#374151")}
             onMouseLeave={e => (e.currentTarget.style.color = "#9CA3AF")}>
@@ -168,7 +168,7 @@ export default function Contact() {
             </div>
             <div>
               <p style={{ fontSize: 10, color: "#9CA3AF", margin: "0 0 2px", textTransform: "uppercase", letterSpacing: "0.08em" }}>E-mail</p>
-              <p style={{ fontSize: 13, color: "#374151", margin: 0 }}>contato@nexora.com.br</p>
+              <p style={{ fontSize: 13, color: "#374151", margin: 0 }}>contato@neurix.com.br</p>
             </div>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -365,7 +365,7 @@ export default function Contact() {
       {/* Footer */}
       <footer style={{ borderTop: "1px solid #F3F4F6" }}>
         <div style={{ maxWidth: 720, margin: "0 auto", padding: "24px", display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
-          <p style={{ fontSize: 11, color: "#D1D5DB", margin: 0 }}>© {new Date().getFullYear()} NEXORA. Todos os direitos reservados.</p>
+          <p style={{ fontSize: 11, color: "#D1D5DB", margin: 0 }}>© {new Date().getFullYear()} NEURIX. Todos os direitos reservados.</p>
           <div style={{ display: "flex", gap: 20 }}>
             <a href="/privacidade" style={{ fontSize: 11, color: "#D1D5DB", textDecoration: "none" }}>Privacidade</a>
             <a href="/termos" style={{ fontSize: 11, color: "#D1D5DB", textDecoration: "none" }}>Termos</a>
