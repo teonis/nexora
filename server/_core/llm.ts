@@ -228,9 +228,9 @@ const resolveApiKey = () => {
 };
 
 const resolveModel = () => {
-  // gemini-2.5-flash funciona no plano gratuito do Google AI Studio.
-  // Para usar gemini-2.5-pro ou gemini-3.1-pro-preview, habilite o faturamento em https://aistudio.google.com
-  if (useGoogleDirectly()) return "gemini-2.5-flash";
+  // gemini-3.1-pro-preview requer conta premium no Google AI Studio.
+  // Para usar gemini-2.5-flash (plano gratuito), remova a GOOGLE_GEMINI_API_KEY do ambiente.
+  if (useGoogleDirectly()) return "gemini-3.1-pro-preview";
   return "gemini-2.5-flash";
 };
 
