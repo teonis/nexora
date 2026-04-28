@@ -171,3 +171,11 @@
 - [x] PDF-2: Adicionar botão "Exportar PDF" na aba SOAP do ConsultationDetail — visível quando a nota SOAP existe
 - [x] PDF-3: Importar ícone Download do lucide-react no ConsultationDetail
 - [x] PDF-4: Verificar TypeScript, rodar testes e salvar checkpoint
+
+## Correções Páginas Planos e Funcionalidades (28/04/2026)
+
+- [x] FIX-NAV-1: Substituir logo NEXORA (4_7e59f0e2.png) pela logo NEURIX correta em PublicNav, Features.tsx e Home.tsx
+- [x] FIX-NAV-2: Corrigir checkout Stripe para não abrir nova aba (window.open → window.location.href)
+- [x] FIX-NAV-3: Remover badge "Plano atual" do plano Gratuito quando usuário não está logado
+- [x] FIX-NAV-4: Remover FAQ "Como testar o pagamento?" (informação de desenvolvimento)
+- [x] FIX-NAV-5: Corrigir ano do copyright para dinâmico (new Date().getFullYear())

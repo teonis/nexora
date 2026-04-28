@@ -31,7 +31,7 @@ export default function PublicNav() {
           {/* Logo */}
           <a href="/" style={{ textDecoration: "none", display: "flex", alignItems: "center" }}>
             <img
-              src="/manus-storage/4_7e59f0e2.png"
+              src="/manus-storage/neurix-logo_7cad8203.png"
               alt="NEURIX"
               style={{ height: 28, objectFit: "contain" }}
             />

@@ -495,7 +495,7 @@ export default function Features() {
         <div style={{ maxWidth: 1080, margin: "0 auto", padding: "40px 24px 32px", display: "flex", flexDirection: "column", gap: 24 }}>
           <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: 24 }}>
             <div>
-              <img src="/manus-storage/4_7e59f0e2.png" alt="NEURIX" style={{ height: 20, objectFit: "contain", marginBottom: 6 }} />
+              <img src="/manus-storage/neurix-logo_7cad8203.png" alt="NEURIX" style={{ height: 20, objectFit: "contain", marginBottom: 6 }} />
               <p style={{ fontSize: 12, color: "#9CA3AF", marginTop: 4, maxWidth: 260, lineHeight: 1.6 }}>Plataforma de inteligência clínica com IA para médicos.</p>
             </div>
             <nav style={{ display: "flex", gap: 32, flexWrap: "wrap" }}>

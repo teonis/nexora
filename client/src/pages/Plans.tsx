@@ -54,7 +54,7 @@ export default function Plans() {
   const createCheckout = trpc.stripe.createCheckoutSession.useMutation({
     onSuccess: (data) => {
       if (data.url) {
-        window.open(data.url, "_blank");
+        window.location.href = data.url;
         toast.info("Redirecionando para o checkout seguro do Stripe...");
       }
       setLoadingPlan(null);
@@ -67,7 +67,7 @@ export default function Plans() {
 
   const createPortal = trpc.stripe.createPortalSession.useMutation({
     onSuccess: (data) => {
-      if (data.url) window.open(data.url, "_blank");
+      if (data.url) window.location.href = data.url;
       setLoadingPlan(null);
     },
     onError: (err) => {
@@ -339,8 +339,8 @@ export default function Plans() {
                 a: "Sim. A NEURIX é compatível com a LGPD. Os dados são criptografados em trânsito e em repouso. Áudios são deletados automaticamente após a transcrição.",
               },
               {
-                q: "Como testar o pagamento?",
-                a: "Use o cartão de teste 4242 4242 4242 4242 com qualquer data futura e CVV. O ambiente de sandbox do Stripe é seguro e não cobra valores reais.",
+                q: "Posso usar em múltiplos dispositivos?",
+                a: "Sim. A NEURIX funciona em qualquer navegador moderno — computador, tablet ou smartphone. Seu acesso é sincronizado em tempo real.",
               },
             ].map((item, i) => (
               <div key={i} style={{ borderBottom: "1px solid #F3F4F6", paddingBottom: 20 }}>
@@ -358,7 +358,7 @@ export default function Plans() {
         display: "flex", justifyContent: "space-between", alignItems: "center",
         flexWrap: "wrap", gap: 12,
       }}>
-        <span style={{ color: "#9CA3AF", fontSize: 13 }}>© 2025 NEURIX. Todos os direitos reservados.</span>
+        <span style={{ color: "#9CA3AF", fontSize: 13 }}>© {new Date().getFullYear()} NEURIX. Todos os direitos reservados.</span>
         <div style={{ display: "flex", gap: 20 }}>
           {[
             { label: "Privacidade", href: "/privacidade" },
