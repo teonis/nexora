@@ -209,14 +209,34 @@ const normalizeToolChoice = (
   return toolChoice;
 };
 
-const resolveApiUrl = () =>
-  ENV.forgeApiUrl && ENV.forgeApiUrl.trim().length > 0
+// Se GOOGLE_GEMINI_API_KEY estiver configurada, usa a API do Google diretamente.
+// Caso contrário, cai no gateway Manus como fallback.
+const useGoogleDirectly = () => Boolean(ENV.googleGeminiApiKey && ENV.googleGeminiApiKey.trim().length > 0);
+
+const resolveApiUrl = () => {
+  if (useGoogleDirectly()) {
+    return "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions";
+  }
+  return ENV.forgeApiUrl && ENV.forgeApiUrl.trim().length > 0
     ? `${ENV.forgeApiUrl.replace(/\/$/, "")}/v1/chat/completions`
     : "https://forge.manus.im/v1/chat/completions";
+};
+
+const resolveApiKey = () => {
+  if (useGoogleDirectly()) return ENV.googleGeminiApiKey;
+  return ENV.forgeApiKey;
+};
+
+const resolveModel = () => {
+  // gemini-2.5-flash funciona no plano gratuito do Google AI Studio.
+  // Para usar gemini-2.5-pro ou gemini-3.1-pro-preview, habilite o faturamento em https://aistudio.google.com
+  if (useGoogleDirectly()) return "gemini-2.5-flash";
+  return "gemini-2.5-flash";
+};
 
 const assertApiKey = () => {
-  if (!ENV.forgeApiKey) {
-    throw new Error("OPENAI_API_KEY is not configured");
+  if (!resolveApiKey()) {
+    throw new Error("Nenhuma chave de API configurada (GOOGLE_GEMINI_API_KEY ou BUILT_IN_FORGE_API_KEY)");
   }
 };
 
@@ -280,7 +300,7 @@ export async function invokeLLM(params: InvokeParams): Promise<InvokeResult> {
   } = params;
 
   const payload: Record<string, unknown> = {
-    model: "gemini-2.5-flash",
+    model: resolveModel(),
     messages: messages.map(normalizeMessage),
   };
 
@@ -316,7 +336,7 @@ export async function invokeLLM(params: InvokeParams): Promise<InvokeResult> {
     method: "POST",
     headers: {
       "content-type": "application/json",
-      authorization: `Bearer ${ENV.forgeApiKey}`,
+      authorization: `Bearer ${resolveApiKey()}`,
     },
     body: JSON.stringify(payload),
   });
