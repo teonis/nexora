@@ -8,6 +8,7 @@ import {
   ArrowLeft,
   Bot,
   CheckCircle,
+  Download,
   FileText,
   Loader2,
   Mic,
@@ -120,6 +121,24 @@ export default function ConsultationDetail() {
       toast.success("PDF gerado com sucesso!");
     },
     onError: (err) => toast.error("Erro ao gerar PDF: " + err.message),
+  });
+
+  const exportSoapPdfMutation = trpc.consultations.exportSoapPdf.useMutation({
+    onSuccess: (data) => {
+      const byteChars = atob(data.base64);
+      const byteNumbers = new Array(byteChars.length);
+      for (let i = 0; i < byteChars.length; i++) byteNumbers[i] = byteChars.charCodeAt(i);
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: "application/pdf" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = data.filename;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success("Nota SOAP exportada em PDF!");
+    },
+    onError: (err) => toast.error("Erro ao exportar SOAP: " + err.message),
   });
 
   // Upload audio to storage then transcribe
@@ -438,27 +457,41 @@ export default function ConsultationDetail() {
                       </div>
                     ))}
 
-                    {!isCompleted && (
-                      <div className="flex gap-2">
-                        <Button
-                          onClick={() => updateSoapMutation.mutate({ consultationId, ...soapEdit })}
-                          disabled={updateSoapMutation.isPending || !soapDirty}
-                          size="sm"
-                        >
-                          {updateSoapMutation.isPending ? <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" /> : <Save className="w-3.5 h-3.5 mr-1.5" />}
-                          Salvar SOAP
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => generateSoapMutation.mutate({ consultationId })}
-                          disabled={generateSoapMutation.isPending}
-                        >
-                          <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
-                          Regenerar
-                        </Button>
-                      </div>
-                    )}
+                    <div className="flex flex-wrap gap-2">
+                      {!isCompleted && (
+                        <>
+                          <Button
+                            onClick={() => updateSoapMutation.mutate({ consultationId, ...soapEdit })}
+                            disabled={updateSoapMutation.isPending || !soapDirty}
+                            size="sm"
+                          >
+                            {updateSoapMutation.isPending ? <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" /> : <Save className="w-3.5 h-3.5 mr-1.5" />}
+                            Salvar SOAP
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => generateSoapMutation.mutate({ consultationId })}
+                            disabled={generateSoapMutation.isPending}
+                          >
+                            <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
+                            Regenerar
+                          </Button>
+                        </>
+                      )}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => exportSoapPdfMutation.mutate({ consultationId })}
+                        disabled={exportSoapPdfMutation.isPending}
+                        className="ml-auto"
+                      >
+                        {exportSoapPdfMutation.isPending
+                          ? <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+                          : <Download className="w-3.5 h-3.5 mr-1.5" />}
+                        Exportar PDF
+                      </Button>
+                    </div>
                   </div>
                 )}
               </>

@@ -164,3 +164,10 @@
 - [x] REN-3: Substituir NEXORA por NEURIX em arquivos de backend (routers.ts, stripeProducts.ts, stripe.test.ts, index.html, index.css)
 - [x] REN-4: Remover todas as menções ao "Charcot IA" — substituido por "Clari IA" no schema.ts
 - [x] REN-5: TypeScript sem erros, 16 testes passando
+
+## Exportação PDF da Nota SOAP
+
+- [x] PDF-1: Adicionar endpoint `consultations.exportSoapPdf` no servidor — gera PDF profissional com as 4 seções SOAP (S/O/A/P) formatadas
+- [x] PDF-2: Adicionar botão "Exportar PDF" na aba SOAP do ConsultationDetail — visível quando a nota SOAP existe
+- [x] PDF-3: Importar ícone Download do lucide-react no ConsultationDetail
+- [x] PDF-4: Verificar TypeScript, rodar testes e salvar checkpoint

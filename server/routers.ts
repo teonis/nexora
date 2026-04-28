@@ -334,6 +334,48 @@ Regras gerais:
       await updateConsultation(input.id, ctx.user.id, { transcription: input.transcription });
       return { success: true };
     }),
+
+  exportSoapPdf: protectedProcedure
+    .input(z.object({ consultationId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const consultation = await getConsultationById(input.consultationId, ctx.user.id);
+      if (!consultation) throw new TRPCError({ code: "NOT_FOUND", message: "Consulta não encontrada" });
+      const soap = await getSoapNoteByConsultation(input.consultationId);
+      if (!soap) throw new TRPCError({ code: "NOT_FOUND", message: "Nota SOAP não encontrada" });
+      const patient = await getPatientById(consultation.patientId, ctx.user.id);
+      const doctor = await getUserById(ctx.user.id);
+      if (!patient || !doctor) throw new TRPCError({ code: "NOT_FOUND" });
+      // Montar conteúdo SOAP formatado em texto estruturado
+      const soapContent = [
+        "S — SUBJETIVO",
+        soap.subjective || "(não preenchido)",
+        "",
+        "O — OBJETIVO",
+        soap.objective || "(não preenchido)",
+        "",
+        "A — AVALIAÇÃO",
+        soap.assessment || "(não preenchido)",
+        "",
+        "P — PLANO",
+        soap.plan || "(não preenchido)",
+      ].join("\n");
+      const { generateClinicalPdf } = await import("./_core/pdfGenerator");
+      const pdfBuffer = await generateClinicalPdf({
+        doctorName: doctor.name || "Médico",
+        doctorCrm: doctor.crm || "Não informado",
+        doctorSpecialty: doctor.specialty || undefined,
+        patientName: patient.fullName,
+        patientDob: patient.dateOfBirth || undefined,
+        documentTitle: "Nota SOAP",
+        documentContent: soapContent,
+        generatedAt: new Date(),
+      });
+      const safeName = `SOAP_${patient.fullName.replace(/[^a-zA-Z0-9à-ü ]/g, "_")}_${new Date().toISOString().slice(0, 10)}.pdf`;
+      return {
+        base64: pdfBuffer.toString("base64"),
+        filename: safeName,
+      };
+    }),
 });
 
 // ─── Documents Router ─────────────────────────────────────────────────────────
