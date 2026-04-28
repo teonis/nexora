@@ -33,7 +33,7 @@ export default function PublicNav() {
             <img
               src="/manus-storage/neurix-logo_7cad8203.png"
               alt="NEURIX"
-              style={{ height: 28, objectFit: "contain" }}
+              style={{ height: 44, objectFit: "contain" }}
             />
           </a>
 
