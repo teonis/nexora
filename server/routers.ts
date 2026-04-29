@@ -60,7 +60,7 @@ import { storagePut } from "./storage";
 import { systemRouter } from "./_core/systemRouter";
 import { stripeRouter } from "./stripeRouter";
 import { protectedProcedure, publicProcedure, superadminProcedure, router } from "./_core/trpc";
-import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
+import { COOKIE_NAME, ONE_YEAR_MS } from "../shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 
 // ─── In-memory rate limiter (per IP) ─────────────────────────────────────────
