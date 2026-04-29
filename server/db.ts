@@ -43,7 +43,7 @@ export async function upsertUser(user: InsertUser): Promise<void> {
   const values: InsertUser = { openId: user.openId };
   const updateSet: Record<string, unknown> = {};
 
-  const textFields = ["name", "email", "loginMethod", "specialty", "passwordHash"] as const;
+  const textFields = ["name", "email", "loginMethod", "specialty"] as const;
   for (const field of textFields) {
     const value = user[field];
     if (value === undefined) continue;
@@ -52,12 +52,16 @@ export async function upsertUser(user: InsertUser): Promise<void> {
     updateSet[field] = normalized;
   }
 
+  // passwordHash: set on INSERT only — use a dedicated updatePassword() for changes
+  if (user.passwordHash !== undefined) {
+    values.passwordHash = user.passwordHash ?? null;
+  }
+
   if (user.lastSignedIn !== undefined) {
     values.lastSignedIn = user.lastSignedIn;
     updateSet.lastSignedIn = user.lastSignedIn;
   }
-  const SUPERADMIN_EMAIL = "teonisr@gmail.com";
-  const isSuperAdmin = user.email === SUPERADMIN_EMAIL || user.openId === ENV.ownerOpenId;
+  const isSuperAdmin = Boolean(ENV.ownerOpenId) && user.openId === ENV.ownerOpenId;
 
   if (user.role !== undefined) {
     values.role = user.role;

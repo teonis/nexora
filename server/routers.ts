@@ -60,8 +60,24 @@ import { storagePut } from "./storage";
 import { systemRouter } from "./_core/systemRouter";
 import { stripeRouter } from "./stripeRouter";
 import { protectedProcedure, publicProcedure, superadminProcedure, router } from "./_core/trpc";
-import { COOKIE_NAME } from "@shared/const";
+import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
+
+// ─── In-memory rate limiter (per IP) ─────────────────────────────────────────
+const _rl = new Map<string, { n: number; reset: number }>();
+function rateLimit(key: string, max: number, windowMs: number): boolean {
+  const now = Date.now();
+  const rec = _rl.get(key);
+  if (!rec || now > rec.reset) { _rl.set(key, { n: 1, reset: now + windowMs }); return true; }
+  if (rec.n >= max) return false;
+  rec.n++;
+  return true;
+}
+function clientIp(req: { ip?: string; headers: Record<string, string | string[] | undefined> }): string {
+  const fwd = req.headers["x-forwarded-for"];
+  const first = Array.isArray(fwd) ? fwd[0] : fwd?.split(",")[0];
+  return (first ?? req.ip ?? "unknown").trim();
+}
 
 // ─── Auth Router ──────────────────────────────────────────────────────────────
 const authRouter = router({
@@ -79,6 +95,9 @@ const authRouter = router({
       specialty: z.string().optional(),
     }))
     .mutation(async ({ ctx, input }) => {
+      if (!rateLimit(`reg:${clientIp(ctx.req)}`, 5, 60 * 60 * 1000)) {
+        throw new TRPCError({ code: "TOO_MANY_REQUESTS", message: "Muitas tentativas. Tente novamente em 1 hora." });
+      }
       const existing = await getUserByEmail(input.email);
       if (existing) {
         const hint = existing.loginMethod === "google"
@@ -117,6 +136,9 @@ const authRouter = router({
       password: z.string().min(1, "Senha obrigatória"),
     }))
     .mutation(async ({ ctx, input }) => {
+      if (!rateLimit(`login:${clientIp(ctx.req)}`, 10, 15 * 60 * 1000)) {
+        throw new TRPCError({ code: "TOO_MANY_REQUESTS", message: "Muitas tentativas. Tente novamente em 15 minutos." });
+      }
       const user = await getUserByEmail(input.email);
 
       if (!user || !user.passwordHash) {

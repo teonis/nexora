@@ -30,7 +30,19 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
   throw new Error(`No available port found starting from ${startPort}`);
 }
 
+function validateEnv() {
+  const required = ["JWT_SECRET", "DATABASE_URL"] as const;
+  const missing = required.filter((k) => !process.env[k]);
+  if (missing.length > 0) {
+    throw new Error(`Missing required environment variables: ${missing.join(", ")}`);
+  }
+  if ((process.env.JWT_SECRET ?? "").length < 16) {
+    throw new Error("JWT_SECRET must be at least 16 characters long");
+  }
+}
+
 async function startServer() {
+  validateEnv();
   const app = express();
   const server = createServer(app);
 

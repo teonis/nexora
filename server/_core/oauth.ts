@@ -1,5 +1,7 @@
 import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 import axios from "axios";
+import { createHmac, randomBytes } from "crypto";
+import { parse as parseCookies } from "cookie";
 import type { Express, Request, Response } from "express";
 import * as db from "../db";
 import { getSessionCookieOptions } from "./cookies";
@@ -11,13 +13,28 @@ function getQueryParam(req: Request, key: string): string | undefined {
   return typeof value === "string" ? value : undefined;
 }
 
+function makeState(nonce: string): string {
+  return createHmac("sha256", ENV.cookieSecret || "insecure-fallback")
+    .update(nonce)
+    .digest("hex");
+}
+
 export function registerOAuthRoutes(app: Express) {
   // Initiates Google OAuth flow
-  app.get("/api/auth/google", (_req: Request, res: Response) => {
+  app.get("/api/auth/google", (req: Request, res: Response) => {
     if (!ENV.googleClientId) {
       res.status(500).json({ error: "Google OAuth is not configured" });
       return;
     }
+
+    const nonce = randomBytes(16).toString("hex");
+    const state = makeState(nonce);
+
+    const cookieOptions = getSessionCookieOptions(req);
+    res.cookie("oauth_nonce", nonce, {
+      ...cookieOptions,
+      maxAge: 10 * 60 * 1000, // 10 minutes
+    });
 
     const authUrl = new URL("https://accounts.google.com/o/oauth2/v2/auth");
     authUrl.searchParams.set("client_id", ENV.googleClientId);
@@ -26,6 +43,7 @@ export function registerOAuthRoutes(app: Express) {
     authUrl.searchParams.set("scope", "openid email profile");
     authUrl.searchParams.set("access_type", "offline");
     authUrl.searchParams.set("prompt", "select_account");
+    authUrl.searchParams.set("state", state);
 
     res.redirect(302, authUrl.toString());
   });
@@ -33,11 +51,23 @@ export function registerOAuthRoutes(app: Express) {
   // Handles Google OAuth callback
   app.get("/api/auth/callback/google", async (req: Request, res: Response) => {
     const code = getQueryParam(req, "code");
+    const state = getQueryParam(req, "state");
     const error = getQueryParam(req, "error");
 
     if (error) {
       console.error("[OAuth] Google returned error:", error);
-      res.redirect(302, "/?auth_error=" + encodeURIComponent(error));
+      res.redirect(302, `/login?error=${encodeURIComponent(error)}`);
+      return;
+    }
+
+    // CSRF check
+    const cookies = parseCookies(req.headers.cookie || "");
+    const nonce = cookies.oauth_nonce;
+    res.clearCookie("oauth_nonce");
+
+    if (!nonce || !state || makeState(nonce) !== state) {
+      console.error("[OAuth] CSRF check failed");
+      res.redirect(302, "/login?error=csrf");
       return;
     }
 
@@ -78,7 +108,7 @@ export function registerOAuthRoutes(app: Express) {
       const googleUser = userInfoRes.data;
 
       if (!googleUser.sub) {
-        res.status(400).json({ error: "Could not retrieve user ID from Google" });
+        res.redirect(302, "/login?error=no_user_id");
         return;
       }
 
@@ -98,10 +128,18 @@ export function registerOAuthRoutes(app: Express) {
       const cookieOptions = getSessionCookieOptions(req);
       res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
 
-      res.redirect(302, "/");
+      // Check account status to redirect correctly
+      const user = await db.getUserByOpenId(googleUser.sub);
+      if (user?.accountStatus === "pending") {
+        res.redirect(302, "/conta/pendente");
+      } else if (user?.accountStatus === "blocked") {
+        res.redirect(302, "/conta/bloqueada");
+      } else {
+        res.redirect(302, "/dashboard");
+      }
     } catch (err) {
       console.error("[OAuth] Google callback failed", err);
-      res.status(500).json({ error: "Google OAuth callback failed" });
+      res.redirect(302, "/login?error=callback_failed");
     }
   });
 }

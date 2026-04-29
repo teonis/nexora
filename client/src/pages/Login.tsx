@@ -1,9 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useLocation } from "wouter";
 import { toast } from "sonner";
+
+const OAUTH_ERROR_MESSAGES: Record<string, string> = {
+  access_denied: "Acesso negado. Você cancelou o login com Google.",
+  csrf: "Sessão de login expirada ou inválida. Tente novamente.",
+  no_user_id: "Não foi possível identificar sua conta Google.",
+  callback_failed: "Erro ao processar o login com Google. Tente novamente.",
+};
 import { trpc } from "@/lib/trpc";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
@@ -257,6 +264,17 @@ function RegisterForm() {
 }
 
 export default function Login() {
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const err = params.get("error");
+    if (err) {
+      const msg = OAUTH_ERROR_MESSAGES[err] ?? "Erro no login. Tente novamente.";
+      toast.error(msg);
+      // Clean the URL without reload
+      window.history.replaceState({}, "", window.location.pathname);
+    }
+  }, []);
+
   return (
     <div style={{
       minHeight: "100vh",
