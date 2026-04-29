@@ -18,6 +18,7 @@ export const users = mysqlTable("users", {
   loginMethod: varchar("loginMethod", { length: 64 }),
   role: mysqlEnum("role", ["user", "admin", "superadmin"]).default("user").notNull(),
   accountStatus: mysqlEnum("accountStatus", ["pending", "approved", "blocked"]).default("pending").notNull(),
+  passwordHash: varchar("passwordHash", { length: 256 }),
   // Medical profile
   specialty: varchar("specialty", { length: 128 }),
   crm: varchar("crm", { length: 32 }),

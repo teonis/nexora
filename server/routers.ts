@@ -1,5 +1,8 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
+import { scrypt, randomBytes, timingSafeEqual } from "crypto";
+import { promisify } from "util";
+import { nanoid } from "nanoid";
 import {
   createChatMessage,
   createClinicalDocument,
@@ -21,6 +24,7 @@ import {
   getProblemsByPatient,
   getSoapNoteByConsultation,
   getTodayConsultations,
+  getUserByEmail,
   getUserById,
   updateConsultation,
   updateClinicalDocument,
@@ -30,7 +34,26 @@ import {
   updateUserStatus,
   upsertPatientProblem,
   upsertSoapNote,
+  upsertUser,
 } from "./db";
+import { sdk } from "./_core/sdk";
+
+const scryptAsync = promisify(scrypt);
+
+async function hashPassword(password: string): Promise<string> {
+  const salt = randomBytes(16).toString("hex");
+  const buf = (await scryptAsync(password, salt, 64)) as Buffer;
+  return `${buf.toString("hex")}.${salt}`;
+}
+
+async function verifyPassword(password: string, hash: string): Promise<boolean> {
+  const [hashedPart, salt] = hash.split(".");
+  if (!hashedPart || !salt) return false;
+  const buf = (await scryptAsync(password, salt, 64)) as Buffer;
+  const hashedBuf = Buffer.from(hashedPart, "hex");
+  if (buf.length !== hashedBuf.length) return false;
+  return timingSafeEqual(buf, hashedBuf);
+}
 import { invokeLLM, type Message } from "./_core/llm";
 import { transcribeAudio } from "./_core/voiceTranscription";
 import { storagePut } from "./storage";
@@ -42,12 +65,100 @@ import { getSessionCookieOptions } from "./_core/cookies";
 
 // ─── Auth Router ──────────────────────────────────────────────────────────────
 const authRouter = router({
-  me: publicProcedure.query((opts) => opts.ctx.user),
+  me: publicProcedure.query((opts) => {
+    if (!opts.ctx.user) return null;
+    const { passwordHash: _, ...publicUser } = opts.ctx.user;
+    return publicUser;
+  }),
+
+  register: publicProcedure
+    .input(z.object({
+      name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
+      email: z.string().email("Email inválido"),
+      password: z.string().min(8, "Senha deve ter pelo menos 8 caracteres"),
+      specialty: z.string().optional(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const existing = await getUserByEmail(input.email);
+      if (existing) {
+        const hint = existing.loginMethod === "google"
+          ? "Este email está vinculado a uma conta Google. Use o botão 'Continuar com Google'."
+          : "Este email já está cadastrado.";
+        throw new TRPCError({ code: "CONFLICT", message: hint });
+      }
+
+      const passwordHash = await hashPassword(input.password);
+      const openId = `email_${nanoid(16)}`;
+
+      await upsertUser({
+        openId,
+        name: input.name,
+        email: input.email,
+        passwordHash,
+        loginMethod: "email",
+        specialty: input.specialty,
+        lastSignedIn: new Date(),
+      });
+
+      const sessionToken = await sdk.createSessionToken(openId, {
+        name: input.name,
+        expiresInMs: ONE_YEAR_MS,
+      });
+
+      const cookieOptions = getSessionCookieOptions(ctx.req);
+      ctx.res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
+
+      return { success: true, accountStatus: "pending" as const };
+    }),
+
+  login: publicProcedure
+    .input(z.object({
+      email: z.string().email("Email inválido"),
+      password: z.string().min(1, "Senha obrigatória"),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const user = await getUserByEmail(input.email);
+
+      if (!user || !user.passwordHash) {
+        if (user?.loginMethod === "google") {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Esta conta usa login com Google. Use o botão 'Continuar com Google'.",
+          });
+        }
+        // Timing-safe: hash a dummy password to avoid user enumeration
+        await hashPassword("dummy_timing_safe_check");
+        throw new TRPCError({ code: "UNAUTHORIZED", message: "Email ou senha incorretos." });
+      }
+
+      const valid = await verifyPassword(input.password, user.passwordHash);
+      if (!valid) {
+        throw new TRPCError({ code: "UNAUTHORIZED", message: "Email ou senha incorretos." });
+      }
+
+      await upsertUser({ openId: user.openId, lastSignedIn: new Date() });
+
+      const sessionToken = await sdk.createSessionToken(user.openId, {
+        name: user.name || "",
+        expiresInMs: ONE_YEAR_MS,
+      });
+
+      const cookieOptions = getSessionCookieOptions(ctx.req);
+      ctx.res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
+
+      return {
+        success: true,
+        accountStatus: user.accountStatus,
+        role: user.role,
+      };
+    }),
+
   logout: publicProcedure.mutation(({ ctx }) => {
     const cookieOptions = getSessionCookieOptions(ctx.req);
     ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
     return { success: true } as const;
   }),
+
   updateProfile: protectedProcedure
     .input(z.object({ specialty: z.string().optional(), crm: z.string().optional(), name: z.string().optional() }))
     .mutation(async ({ ctx, input }) => {

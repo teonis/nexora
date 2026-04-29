@@ -21,6 +21,7 @@ import Plans from "./pages/Plans";
 import AdminUsers from "./pages/AdminUsers";
 import PendingApproval from "./pages/PendingApproval";
 import BlockedAccount from "./pages/BlockedAccount";
+import Login from "./pages/Login";
 
 function Router() {
   return (
@@ -40,6 +41,7 @@ function Router() {
       <Route path="/contato" component={Contact} />
       <Route path="/planos" component={Plans} />
       <Route path="/admin/usuarios" component={AdminUsers} />
+      <Route path="/login" component={Login} />
       <Route path="/conta/pendente" component={PendingApproval} />
       <Route path="/conta/bloqueada" component={BlockedAccount} />
       <Route path="/404" component={NotFound} />
